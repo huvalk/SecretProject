@@ -1,0 +1,4 @@
+module DefaultList
+DefaultListView 1.0 DefaultListView.qml
+DefaultListDelegate 1.0 DefaultListDelegate.qml
+DefaultListSectionDelegate 1.0 DefaultListSectionDelegate.qml

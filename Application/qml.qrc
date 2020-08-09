@@ -1,0 +1,37 @@
+<RCC>
+    <qresource prefix="/">
+        <file>qml/Pages/DefaultPage.qml</file>
+        <file>qml/Pages/MainPage.qml</file>
+        <file>qml/Pages/OpenPage.qml</file>
+        <file>qml/Pages/qmldir</file>
+        <file>qml/StyleSettings/qmldir</file>
+        <file>qml/StyleSettings/Style.qml</file>
+        <file>qml/ResourceProvider/qmldir</file>
+        <file>qml/ResourceProvider/Resources.qml</file>
+        <file>qml/resources/browse_file.png</file>
+        <file>qml/resources/browse_source.xcf</file>
+        <file>qml/resources/search_file.png</file>
+        <file>qml/resources/search_source.xcf</file>
+        <file>qml/CustomItems/qmldir</file>
+        <file>qml/CustomItems/DefaultButton.qml</file>
+        <file>qml/CustomItems/DefaultInput.qml</file>
+        <file>qml/CustomItems/SlideStack.qml</file>
+        <file>qml/CustomItems/RoundImage.qml</file>
+        <file>qml/SearchList/qmldir</file>
+        <file>qml/SearchList/SearchView.qml</file>
+        <file>qml/SearchList/SearchDelegate.qml</file>
+        <file>qml/CustomItems/BaseText.qml</file>
+        <file>qml/CustomItems/ImageBubble.qml</file>
+        <file>qml/CustomItems/DefaultList/DefaultListDelegate.qml</file>
+        <file>qml/CustomItems/DefaultList/DefaultListSectionDelegate.qml</file>
+        <file>qml/CustomItems/DefaultList/qmldir</file>
+        <file>qml/CustomItems/DefaultList/DefaultListView.qml</file>
+        <file>qml/resources/user_file.png</file>
+        <file>qml/Pages/BackButton.qml</file>
+        <file>qml/CustomItems/DefaultCheckBox.qml</file>
+        <file>main.qml</file>
+        <file>qml/Pages/DrawPage.qml</file>
+        <file>qml/DrawingScene/DrawingScene.qml</file>
+        <file>qml/DrawingScene/qmldir</file>
+    </qresource>
+</RCC>

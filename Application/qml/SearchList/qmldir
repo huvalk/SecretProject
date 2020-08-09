@@ -1,0 +1,3 @@
+module SearchList
+SearchDelegate 1.0 SearchDelegate.qml
+SearchView 1.0 SearchView.qml
