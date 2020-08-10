@@ -1,31 +1,35 @@
 #include "GraphicScene/graphicitem.h"
 #include "cmath"
 
-GraphicItem::GraphicItem(QRect&& boundingRect, bool visable)
+GraphicItem::GraphicItem(QRectF&& boundingRect, bool visable)
     : _boundingRect(boundingRect.normalized()),
       _visable(visable)
 {
+    _boundingRect.adjust(-1, -1, 1, 1);
 }
 
-GraphicItem::GraphicItem(QRect& boundingRect, bool visable)
+GraphicItem::GraphicItem(const QRectF& boundingRect, bool visable)
     : _boundingRect(boundingRect.normalized()),
       _visable(visable)
 {
+    _boundingRect.adjust(-1, -1, 1, 1);
 }
 
-GraphicItem::GraphicItem(QPoint topLeft, QPoint bottomRight, bool visable)
+GraphicItem::GraphicItem(const QPointF& topLeft, const QPointF& bottomRight, bool visable)
     : _boundingRect(topLeft, bottomRight),
       _visable(visable)
 {
+    _boundingRect.adjust(-1, -1, 1, 1);
 }
 
-GraphicItem::GraphicItem(int x1, int y1, int w, int h, bool visable)
+GraphicItem::GraphicItem(double x1, double y1, double w, double h, bool visable)
     : _boundingRect(x1, y1, w, h),
       _visable(visable)
 {
+    _boundingRect.adjust(-1, -1, 1, 1);
 }
 
-QRect GraphicItem::boundingRect()
+QRectF GraphicItem::boundingRect()
 {
     return _boundingRect;
 }
@@ -35,10 +39,9 @@ bool GraphicItem::pointInArea(const QPointF &pos)
     return _boundingRect.contains(pos.toPoint());
 }
 
-bool GraphicItem::pointInArea(float x, float y)
+bool GraphicItem::pointInArea(double x, double y)
 {
-    return _boundingRect.contains(static_cast<int>(std::round(x)),
-                                  static_cast<int>(std::round(y)));
+    return _boundingRect.contains(x,y);
 }
 
 void GraphicItem::setVisable(bool visable)

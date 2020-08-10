@@ -58,15 +58,15 @@ private:
     std::map<int, std::set<std::shared_ptr<GraphicLine>>> _lines;
     QString                         _name;                 // Название объекта, по большей части до кучи добавлено
     QColor                          _backgroundColor;
-    QRect                           _canvasWindow;
-    QRect                           _changeArea;
-    QPoint                          _offset;
+    QRectF                          _canvasWindow;
+    QRectF                          _changeArea;
+    QPointF                         _offset;
     QPoint                          _dragPoint;
+    double                          _canvasWidth;
+    double                          _canvasHeight;
     std::shared_ptr<GraphicPoint>   _tempPoint;
     std::unique_ptr<GraphicPoint>   _cursorPoint;
     int                             _floor;
-    float                           _canvasWidth;
-    float                           _canvasHeight;
     uint8_t                         _pointSize;
     uint8_t                         _gridSize;
     uint8_t                         _scale;
@@ -82,14 +82,14 @@ private:
     void dragBegins(const QPoint& pos);
     void dragMove(const QPoint& pos);
     void dragEnds(const QPoint& pos);
-    void cursorShadow(const QPointF& pos);
-    void lineAttachment(const QPointF& pos);
+    bool cursorShadow(const QPointF& pos);
+    bool lineAttachment(const QPointF& pos);
     std::shared_ptr<GraphicPoint> findPoint(const QPointF& pos);
     std::shared_ptr<GraphicLine> findLine(const QPointF& pos);
-    void addPoint(const QPointF &pos);
-    void addLine(const QPointF &pos);
-    void deleteItem(const QPointF &pos);
-    void extendChangeArea(const QRect& newRect);
+    bool addPoint(const QPointF &pos);
+    bool addLine(const QPointF &pos);
+    bool deleteItem(const QPointF &pos);
+    void extendChangeArea(const QRectF& newRect);
     void drawGrid(QPainter* painter);
 
     void geometryChanged(const QRectF &newGeometry, const QRectF &oldGeometry) override;

@@ -13,9 +13,9 @@ GraphicScene::GraphicScene(QQuickItem *parent):
     _changeArea(_canvasWindow),
     _offset(0, 0),
     _dragPoint(0, 0),
-    _floor(1),
     _canvasWidth(),
     _canvasHeight(),
+    _floor(1),
     _pointSize(5),
     _gridSize(16),
     _scale(2),
@@ -46,19 +46,6 @@ void GraphicScene::paint(QPainter* painter)
     }
 
     //TODO избавиться от changeArea пока
-
-    auto currentFloorPoints = _points.find(_floor);
-    if (currentFloorPoints != _points.end())
-    {
-        for (auto item: currentFloorPoints->second)
-        {
-            if (item->redrawRequest(_canvasWindow))
-            {
-                item->paint(painter, _offset, _scale);
-            }
-        }
-    }
-
     painter->setRenderHint(QPainter::Antialiasing, true);
     auto currentFloorLines = _lines.find(_floor);
     if (currentFloorLines != _lines.end())
@@ -72,7 +59,23 @@ void GraphicScene::paint(QPainter* painter)
         }
     }
 
-    _cursorPoint->paint(painter, _offset, _scale);
+    if (!_isDragging)
+    {
+        painter->setRenderHint(QPainter::Antialiasing, false);
+        auto currentFloorPoints = _points.find(_floor);
+        if (currentFloorPoints != _points.end())
+        {
+            for (auto item: currentFloorPoints->second)
+            {
+                if (item->redrawRequest(_canvasWindow))
+                {
+                    item->paint(painter, _offset, _scale);
+                }
+            }
+        }
+
+        _cursorPoint->paint(painter, _offset, _scale);
+    }
 }
 
 QString GraphicScene::name() const
@@ -143,8 +146,6 @@ void GraphicScene::zoomIn(const QPoint& pos)
                           _offset.y() / _scale,
                           static_cast<int>(_canvasWidth / _scale),
                           static_cast<int>(_canvasHeight / _scale));
-
-    update();
 }
 
 void GraphicScene::zoomOut(const QPoint &pos)
@@ -155,8 +156,6 @@ void GraphicScene::zoomOut(const QPoint &pos)
                           _offset.y() / _scale,
                           static_cast<int>(_canvasWidth / _scale),
                           static_cast<int>(_canvasHeight / _scale));
-
-    update();
 }
 
 void GraphicScene::dragBegins(const QPoint &pos)
@@ -171,8 +170,6 @@ void GraphicScene::dragMove(const QPoint &pos)
     _offset += _dragPoint - pos;
     _canvasWindow.moveTo(_offset / _scale);
     _dragPoint = pos;
-
-    update();
 }
 
 void GraphicScene::dragEnds(const QPoint &pos)
@@ -183,59 +180,59 @@ void GraphicScene::dragEnds(const QPoint &pos)
     _cursorPoint->setVisable(true);
 }
 
-void GraphicScene::cursorShadow(const QPointF& pos)
+bool GraphicScene::cursorShadow(const QPointF& pos)
 {
     QPointF virtPos = getMousePosition(pos);
-    float startX = std::round(static_cast<float>(virtPos.x()) / (_gridSize * _scale)) *
+    double startX = std::round(virtPos.x() / (_gridSize * _scale)) *
                             (_gridSize);
-    float startY = std::round(static_cast<float>(virtPos.y()) / (_gridSize * _scale)) *
+    double startY = std::round(virtPos.y() / (_gridSize * _scale)) *
                             (_gridSize);
 
     if (_cursorPoint->wasClicked(startX, startY, _scale))
     {
-        return;
+        return false;
     }
 
-//    extendChangeArea(_cursorPoint->boundingRect());
-    _cursorPoint->moveTo(static_cast<int>(std::round(startX)), static_cast<int>(std::round(startY)));
+    extendChangeArea(_cursorPoint->boundingRect());
+    _cursorPoint->moveTo(startX, startY);
 
-    update();
+    return true;
 }
 
-void GraphicScene::lineAttachment(const QPointF &pos)
+bool GraphicScene::lineAttachment(const QPointF &pos)
 {
     QPointF virtPos = getMousePosition(pos);
-    float startX = std::round(static_cast<float>(virtPos.x()) / (_gridSize * _scale)) *
+    double startX = std::round(virtPos.x() / (_gridSize * _scale)) *
             (_gridSize);
-    float startY = std::round(static_cast<float>(virtPos.y()) / (_gridSize * _scale)) *
+    double startY = std::round(virtPos.y() / (_gridSize * _scale)) *
             (_gridSize);
 
     if (_cursorPoint->wasClicked(startX, startY, _scale))
     {
-        return;
+        return false;
     }
 
     auto currentFloor = _lines.find(_floor);
     if (currentFloor == _lines.end())
     {
-        return;
+        return false;
     }
 
-    float newX = startX;
-    float newY = startY;
-    float minDistance = std::numeric_limits<float>::max();
+    double newX = startX;
+    double newY = startY;
+    double minDistance = std::numeric_limits<double>::max();
     virtPos = virtPos / _scale;
 
     for (auto item: currentFloor->second)
     {
         if (item->pointInArea(startX, startY))
         {
-          float pointCrossX = item->getXbyY(startY);
-          float pointCrossY = item->getYbyX(startX);
-          float distanceCrossX = std::hypotf((pointCrossX - static_cast<float>(virtPos.x())),
-                                            (startY - static_cast<float>(virtPos.y())));
-          float distanceCrossY = std::hypotf((startX - static_cast<float>(virtPos.x())),
-                                             (pointCrossY - static_cast<float>(virtPos.y())));
+          double pointCrossX = item->getXbyY(startY);
+          double pointCrossY = item->getYbyX(startX);
+          double distanceCrossX = std::hypot((pointCrossX - virtPos.x()),
+                                            (startY - virtPos.y()));
+          double distanceCrossY = std::hypot((startX - virtPos.x()),
+                                             (pointCrossY - virtPos.y()));
 
           if (distanceCrossX <= distanceCrossY) {
             if (distanceCrossX < minDistance) {
@@ -251,11 +248,10 @@ void GraphicScene::lineAttachment(const QPointF &pos)
         }
     }
 
-    newX = std::round(newX);
-    newY = std::round(newY);
     extendChangeArea(_cursorPoint->boundingRect());
-    _cursorPoint->moveTo(static_cast<int>(newX), static_cast<int>(newY));
-    update();
+    _cursorPoint->moveTo(newX, newY);
+
+    return true;
 }
 
 std::shared_ptr<GraphicPoint> GraphicScene::findPoint(const QPointF &pos)
@@ -296,40 +292,47 @@ std::shared_ptr<GraphicLine> GraphicScene::findLine(const QPointF &pos)
     return nullptr;
 }
 
-void GraphicScene::addPoint(const QPointF &pos)
+bool GraphicScene::addPoint(const QPointF &pos)
 {
     _tempPoint = findPoint(pos);
     if (_tempPoint == nullptr)
     {
-        _tempPoint = std::make_shared<GraphicPoint>(pos.toPoint(), _pointSize, 2);
+        _tempPoint = std::make_shared<GraphicPoint>(pos, _pointSize, 2);
         _points[_floor].insert(_tempPoint);
     }
     _lineBegins = true;
+    return true;
 }
 
-void GraphicScene::addLine(const QPointF &pos)
+bool GraphicScene::addLine(const QPointF &pos)
 {
     if (_lineBegins)
     {
         auto currentFloor = _points.find(_floor);
         if (currentFloor == _points.end())
         {
-            return;
+            return false;
         }
 
-        if (!_tempPoint->wasClicked(pos))
+        if (_tempPoint->wasClicked(pos))
         {
-            _lines[_floor].emplace(std::make_shared<GraphicLine>(_tempPoint->pos(), pos.toPoint()));
-            currentFloor->second.erase(_tempPoint);
-            currentFloor->second.erase(findPoint(pos));
-            //TODO Утечка?
-            _tempPoint = nullptr;
-            _lineBegins = false;
+            return false;
         }
+
+        _lines[_floor].emplace(std::make_shared<GraphicLine>(_tempPoint->pos(), pos));
+        currentFloor->second.erase(_tempPoint);
+        currentFloor->second.erase(findPoint(pos));
+        //TODO Утечка?
+        _tempPoint = nullptr;
+        _lineBegins = false;
+
+        return true;
     }
+
+    return false;
 }
 
-void GraphicScene::deleteItem(const QPointF &pos)
+bool GraphicScene::deleteItem(const QPointF &pos)
 {
     auto point = findPoint(pos);
 
@@ -338,7 +341,7 @@ void GraphicScene::deleteItem(const QPointF &pos)
         extendChangeArea(point->boundingRect());
         _points[_floor].erase(point);
 
-        return;
+        return true;
     }
 
     auto line = findLine(pos);
@@ -349,10 +352,14 @@ void GraphicScene::deleteItem(const QPointF &pos)
         addPoint(line->getFirstPoint());
         addPoint(line->getSecondPoint());
         _lines[_floor].erase(line);
+
+        return true;
     }
+
+    return false;
 }
 
-void GraphicScene::extendChangeArea(const QRect &newRect)
+void GraphicScene::extendChangeArea(const QRectF &newRect)
 {
     if (_changeArea.isEmpty())
     {
@@ -365,29 +372,36 @@ void GraphicScene::extendChangeArea(const QRect &newRect)
 
 void GraphicScene::drawGrid(QPainter *painter)
 {
-    int x1 = _changeArea.x();
-    int y1 = _changeArea.y();
-    int x2 = x1 + _changeArea.width();
-    int y2 = y1 + _changeArea.height();
-    int startX = static_cast<int>(std::round((x1 + _offset.x()) / (_gridSize * _scale)) *
-                                  (_gridSize * _scale) - _offset.x());
-    int startY = static_cast<int>(std::round((y1 + _offset.y()) / (_gridSize * _scale)) *
-                                  (_gridSize * _scale) - _offset.y());
+    double x1 = _changeArea.x();
+    double y1 = _changeArea.y();
+    double x2 = x1 + _changeArea.width();
+    double y2 = y1 + _changeArea.height();
+    double startX = std::round((x1 + _offset.x()) / (_gridSize * _scale)) *
+                                  (_gridSize * _scale) - _offset.x();
+    double startY = std::round((y1 + _offset.y()) / (_gridSize * _scale)) *
+                                  (_gridSize * _scale) - _offset.y();
 
     painter->setPen("#AAAAAA");
-    for (int i = startY; i <= y2; i += _gridSize * _scale)
+    for (double i = startY; i <= y2; i += _gridSize * _scale)
     {
-        painter->drawLine(x1 - 2, i, x2 + 2, i);
+        painter->drawLine(static_cast<int>(x1),
+                          static_cast<int>(i),
+                          static_cast<int>(x2),
+                          static_cast<int>(i));
     }
-    for (int i = startX; i <= x2; i += _gridSize * _scale)
+    for (double i = startX; i <= x2; i += _gridSize * _scale)
     {
-        painter->drawLine(i, y1 - 2, i, y2 + 2);
+        painter->drawLine(static_cast<int>(i),
+                          static_cast<int>(y1),
+                          static_cast<int>(i),
+                          static_cast<int>(y2));
     }
 }
 
 void GraphicScene::geometryChanged(const QRectF &newGeometry, const QRectF &oldGeometry)
 {
-    _canvasWindow = newGeometry.toRect();
+    (void)oldGeometry;
+    _canvasWindow = newGeometry;
     _canvasWidth = _canvasWindow.width();
     _canvasHeight = _canvasWindow.height();
     _changeArea = _canvasWindow;
@@ -396,13 +410,14 @@ void GraphicScene::geometryChanged(const QRectF &newGeometry, const QRectF &oldG
 
 void GraphicScene::mousePressEvent(QMouseEvent *event)
 {
+    bool result = false;
     switch (event->button())
     {
     case Qt::LeftButton:
-        addPoint(_cursorPoint->pos());
+        result = addPoint(_cursorPoint->pos());
         break;
     case Qt::RightButton:
-        deleteItem(_cursorPoint->pos());
+        result = deleteItem(_cursorPoint->pos());
         break;
     default:
         break;
@@ -412,32 +427,49 @@ void GraphicScene::mousePressEvent(QMouseEvent *event)
     {
         dragBegins(event->pos());
     }
+
+    if (result)
+    {
+        update();
+    }
 }
 
 void GraphicScene::mouseReleaseEvent(QMouseEvent *event)
 {
+    bool result = false;
     if (event->button() == Qt::LeftButton)
     {
-        addLine(_cursorPoint->pos());
+        result = addLine(_cursorPoint->pos());
     }
-
     if (event->button() == Qt::MidButton)
     {
         dragEnds(event->pos());
+    }
+
+    if (result)
+    {
+        update();
     }
 }
 
 void GraphicScene::mouseMoveEvent(QMouseEvent *event)
 {
+    bool result = false;
     if (_isDragging)
     {
         dragMove(event->pos());
+        result = true;
     } else if (_ctrlPressed)
     {
-        lineAttachment(event->pos());
+        result = lineAttachment(event->pos());
     } else
     {
-        cursorShadow(event->pos());
+        result = cursorShadow(event->pos());
+    }
+
+    if (result)
+    {
+        update();
     }
 }
 
@@ -454,16 +486,24 @@ void GraphicScene::wheelEvent(QWheelEvent *event)
         zoomOut(QPoint(event->x(), event->y()));
       }
     }
+
+    update();
 }
 
 void GraphicScene::hoverMoveEvent(QHoverEvent *event)
 {
+    bool result = false;
     if (_ctrlPressed)
     {
-        lineAttachment(event->posF());
+        result = lineAttachment(event->posF());
     } else
     {
-        cursorShadow(event->posF());
+        result = cursorShadow(event->posF());
+    }
+
+    if (result)
+    {
+        update();
     }
 }
 
@@ -472,6 +512,8 @@ void GraphicScene::keyPressEvent(QKeyEvent *event)
     switch (event->key()) {
     case Qt::Key_Control:
         _ctrlPressed = true;
+        break;
+    case Qt::Key_Shift:
         break;
     default:
         break;
@@ -491,7 +533,7 @@ void GraphicScene::keyReleaseEvent(QKeyEvent *event)
 
 void GraphicScene::focusInEvent(QFocusEvent *event)
 {
-    qDebug() << "focus";
+    (void)event;
 }
 
 

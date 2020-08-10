@@ -5,27 +5,27 @@
 class GraphicLine: public GraphicItem
 {
 public:
-    GraphicLine(QPoint firstPoint, QPoint secondPoint);
+    GraphicLine(const QPointF& firstPoint, const QPointF& secondPoint);
 
-    QPoint pos() override;
-    bool redrawRequest(const QRect& changeArea) override;
+    QPointF pos() override;
+    bool redrawRequest(const QRectF& changeArea) override;
     bool wasClicked(const QPointF& pos, const uint8_t scale = 1) override;
-    bool wasClicked(const float x, const float y, const uint8_t scale = 1) override;
+    bool wasClicked(const double x, const double y, const uint8_t scale = 1) override;
     GraphicType type() override;
-    void paint(QPainter* painter, const QPoint& offset, const uint8_t scale) override;
-    void moveTo(const QPoint& offset) override;
-    void moveTo(const int x, const int y) override;
-    float getYbyX(float x);
-    float getXbyY(float y);
-    const QPoint& getFirstPoint();
-    const QPoint& getSecondPoint();
+    void paint(QPainter* painter, const QPointF& offset, const uint8_t scale) override;
+    void moveTo(const QPointF& offset) override;
+    void moveTo(const double x, const double y) override;
+    double getYbyX(double x) const;
+    double getXbyY(double y) const;
+    const QPointF& getFirstPoint() const;
+    const QPointF& getSecondPoint() const;
 
     ~GraphicLine() override;
 
 private:
     QColor  _fillStyle;
-    QPoint _firstPoint;
-    QPoint _secondPoint;
+    QPointF _firstPoint;
+    QPointF _secondPoint;
     int8_t  _width;
 };
 

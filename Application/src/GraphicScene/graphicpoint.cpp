@@ -2,7 +2,7 @@
 #include "GraphicScene/graphicpoint.h"
 #include <QDebug>
 
-GraphicPoint::GraphicPoint(int x, int y, int radius, int8_t border, QColor strokeStyle, QColor fillStyle)
+GraphicPoint::GraphicPoint(double x, double y, int radius, int8_t border, QColor strokeStyle, QColor fillStyle)
     : GraphicItem((x - border - radius),
                   (y - border - radius),
                   (2 * (border + radius)),
@@ -14,7 +14,7 @@ GraphicPoint::GraphicPoint(int x, int y, int radius, int8_t border, QColor strok
 {
 }
 
-GraphicPoint::GraphicPoint(const QPoint &pos, int radius, int8_t border, QColor strokeStyle, QColor fillStyle)
+GraphicPoint::GraphicPoint(const QPointF &pos, int radius, int8_t border, QColor strokeStyle, QColor fillStyle)
     : GraphicItem((pos.x() - border - radius),
                   (pos.y() - border - radius),
                   (2 * (border + radius)),
@@ -26,28 +26,28 @@ GraphicPoint::GraphicPoint(const QPoint &pos, int radius, int8_t border, QColor 
 {
 }
 
-QPoint GraphicPoint::pos()
+QPointF GraphicPoint::pos()
 {
     return _center;
 }
 
-bool GraphicPoint::redrawRequest(const QRect &changeArea)
+bool GraphicPoint::redrawRequest(const QRectF &changeArea)
 {
     return _boundingRect.intersects(changeArea);
 }
 
 bool GraphicPoint::wasClicked(const QPointF &pos, const uint8_t scale)
 {
-    return wasClicked(static_cast<float>(pos.x()), static_cast<float>(pos.y()), scale);
+    return wasClicked(pos.x(), pos.y(), scale);
 }
 
-bool GraphicPoint::wasClicked(const float x, const float y, const uint8_t scale)
+bool GraphicPoint::wasClicked(const double x, const double y, const uint8_t scale)
 {
     //TODO неправильное преобразование
-    float nx = x / scale;
-    float ny = y / scale;
+    double nx = x / scale;
+    double ny = y / scale;
 
-    if (_boundingRect.contains(static_cast<int>(nx), static_cast<int>(ny)))
+    if (_boundingRect.contains(nx, ny))
     {
         return (std::hypot((_center.x() - nx),
                            (_center.y() - ny)) <=
@@ -62,29 +62,24 @@ GraphicType GraphicPoint::type()
     return GraphicType::Point;
 }
 
-void GraphicPoint::paint(QPainter *painter, const QPoint &offset, const uint8_t scale)
+void GraphicPoint::paint(QPainter *painter, const QPointF &offset, const uint8_t scale)
 {
     //TODO Предварительно прощитывать настоящее положение
-    painter->setPen(_strokeStyle);
-    painter->setBrush(_fillStyle);
+    painter->setPen(QPen(QBrush(_strokeStyle), 1, Qt::SolidLine, Qt::RoundCap));
+    painter->setBrush(QBrush(_fillStyle));
     painter->drawEllipse((_center * scale - offset), _radius, _radius);
 }
 
-void GraphicPoint::moveTo(const QPoint &offset)
+void GraphicPoint::moveTo(const QPointF &offset)
 {
-    _topLeft.setX(offset.x() - _border - _radius);
-    _topLeft.setY(offset.y() - _border - _radius);
-    _center = offset;
-    _boundingRect.moveTo(_topLeft);
+    moveTo(offset.x(), offset.y());
 }
 
-void GraphicPoint::moveTo(const int x, const int y)
+void GraphicPoint::moveTo(const double x, const double y)
 {
-    _topLeft.setX(x - _border - _radius);
-    _topLeft.setY(y - _border - _radius);
     _center.setX(x);
     _center.setY(y);
-    _boundingRect.moveTo(_topLeft);
+    _boundingRect.moveTo(x - _border - _radius, y - _border - _radius);
 }
 
 GraphicPoint::~GraphicPoint()
