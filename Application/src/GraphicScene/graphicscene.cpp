@@ -322,7 +322,6 @@ bool GraphicScene::addLine(const QPointF &pos)
         _lines[_floor].emplace(std::make_shared<GraphicLine>(_tempPoint->pos(), pos));
         currentFloor->second.erase(_tempPoint);
         currentFloor->second.erase(findPoint(pos));
-        //TODO Утечка?
         _tempPoint = nullptr;
         _lineBegins = false;
 
