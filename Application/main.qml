@@ -28,7 +28,6 @@ Window {
         durationPopEnter: _style.transitionDuration
         durationPopExit: _style.transitionDuration
         onCurrentItemChanged: {
-            console.log("item changed")
             if (currentItem) {
               currentItem.defaultFocusItem.focus = true
             }
@@ -59,6 +58,7 @@ Window {
         openFilePath: _fileDialog.fileUrl
 
         onCreateNewClicked: {
+            _drawPage.mapID = _openPage.openedMapID
             _stackView.push(_drawPage)
         }
 

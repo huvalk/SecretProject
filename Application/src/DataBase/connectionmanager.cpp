@@ -1,5 +1,5 @@
-#include "connectionmanager.h"
-#include "dbtypes.h"
+#include "DataBase/connectionmanager.h"
+#include "DataBase/dbtypes.h"
 #include <QDebug>
 #include <QDir>
 #include <QStandardPaths>
@@ -8,9 +8,6 @@
 #include <QSqlError>
 #include <QSqlQuery>
 
-using std::string;
-
-namespace DB {
 struct ConnectionManager::ConnectionManagerPrivate
 {
     struct SqliteDeleter
@@ -106,52 +103,49 @@ bool ConnectionManager::ConnectionManagerPrivate::setupWorkspace()
 
 bool ConnectionManager::ConnectionManagerPrivate::setupTables()
 {
-//    bool result {true};
+    bool result {true};
 
-//    std::vector<QString> tablesNames {
-//        QString {
-//            "MapFiles"
-//        },
-//        QString {
-//            "Maps"
-//        }
-//    };
+    std::vector<QString> tablesNames {
+        QString {
+            "MapFiles"
+        },
+        QString {
+            "Maps"
+        }
+    };
 
-//    std::vector<QSqlQuery> creationQueries {
-//        QSqlQuery {
-//            "CREATE TABLE IF NOT  EXISTS MapFiles"
-//            "("
-//            "map_id INT PRIMARY KEY,"
-//            "map_name TEXT NOT NULL,"
-//            "author_tag TEXT NOT NULL,"
-//            "map_picture TEXT NOT NULL,"
-//            "map_cihanged TIMESTAMP DEFAULT CURRENT_TIMESTAMP"
-//            ")"
-//        },
-//        QSqlQuery {
-//            "CREATE TABLE IF NOT  EXISTS Maps"
-//            "("
-//            "name TEXT,"
-//            "author_tag TEXT,"
-//            "picture TEXT,"
-//            "changed TIMESTAMP DEFAULT CURRENT_TIMESTAMP"
-//            ")"
-//        }
-//    };
+    std::vector<QSqlQuery> creationQueries {
+        QSqlQuery {
+            "CREATE TABLE IF NOT  EXISTS MapFiles"
+            "("
+            "map_id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,"
+            "map_name TEXT NOT NULL DEFAULT '',"
+            "author_tag TEXT NOT NULL DEFAULT '',"
+            "map_picture TEXT NOT NULL DEFAULT '',"
+            "map_cihanged TIMESTAMP DEFAULT CURRENT_TIMESTAMP"
+            ")"
+        },
+        QSqlQuery {
+            "CREATE TABLE IF NOT  EXISTS Maps"
+            "("
+            "map_id INT PRIMARY KEY NOT NULL,"
+            "map TEXT NOT NULL"
+            ")"
+        }
+    };
 
-//    for (size_t i = 0; i < tablesNames.size(); ++i)
-//    {
-//        if (!db->tables().contains(tablesNames[i]))
-//        {
-//            if (!creationQueries[i].exec())
-//            {
-//                result = false;
-//                state = DBState::ERROR_TABLES;
-//                qWarning() << creationQueries[i].lastError().text();
-//            }
-//        }
-//    }
+    for (size_t i = 0; i < tablesNames.size(); ++i)
+    {
+        if (!db->tables().contains(tablesNames[i]))
+        {
+            if (!creationQueries[i].exec())
+            {
+                result = false;
+                state = DBState::ERROR_TABLES;
+                qWarning() << creationQueries[i].lastError().text();
+            }
+        }
+    }
 
-//    return result;
-}
+    return result;
 }

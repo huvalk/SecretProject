@@ -3,7 +3,7 @@
 #include "processor.h"
 
 MapFileReader::MapFileReader()
-    : _processor {std::make_unique<DB::Processor>()}
+    : _database {CommonDataBase::instance()}
 {
 
 }
@@ -27,9 +27,9 @@ std::vector<MapFile> transform(const std::vector<QVariantList>& source)
 
 std::pair<bool, std::vector<MapFile> > MapFileReader::requestFilesBrowse()
 {
-    DB::DBResult result;
+    DBResult result;
     std::vector<QVariantList> query;
-    std::tie(result, query) = _processor->requestTableData(DB::DBTables::MapFiles);
+    std::tie(result, query) = _database.selectMapFiles();
 
-    return std::make_pair(result == DB::DBResult::OK, transform(query));
+    return std::make_pair(result == DBResult::OK, transform(query));
 }

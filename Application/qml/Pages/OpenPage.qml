@@ -8,6 +8,7 @@ import SearchList 1.0
 
 DefaultPage {
     property alias openFilePath: _filePathInput.text
+    property int openedMapID
     signal createNewClicked
     signal browseFileClicked
     defaultFocusItem: _browseFileBtn
@@ -59,6 +60,7 @@ DefaultPage {
                 btnRadius: _style.btnRadius
 
                 onClicked: {
+
                     root.browseFileClicked()
                 }
             }
@@ -84,6 +86,7 @@ DefaultPage {
                 btnRadius: _style.btnRadius
 
                 onClicked: {
+                    openedMapID = database.saveMapFile(_filePathInput.text)
                     root.createNewClicked()
                 }
             }

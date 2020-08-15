@@ -23,14 +23,12 @@ class GraphicScene : public QQuickPaintedItem
     Q_PROPERTY(int scale READ scale WRITE setScale NOTIFY scaleChanged)
     Q_PROPERTY(int floor READ floor WRITE setFloor NOTIFY floorChanged)
 
-
 public:
-    explicit GraphicScene(QQuickItem *parent = 0);
+    Q_INVOKABLE QString generateJSONScene();
+
+    explicit GraphicScene(QQuickItem *parent = nullptr);
     static void registerMe(const std::string& moduleName);
     void paint(QPainter* painter) override;
-
-        // Методы, доступные из QML для ...
-//        Q_INVOKABLE void clear();   // ... очистки времени, ...
 
     QString name() const;
     QColor backgroundColor() const;
@@ -56,6 +54,7 @@ private:
     //TODO Заменить на один мап с очередью на отрисовку
     std::map<int, std::set<std::shared_ptr<GraphicPoint>>> _points;
     std::map<int, std::set<std::shared_ptr<GraphicLine>>> _lines;
+    QString                         _jsonScene;
     QString                         _name;                 // Название объекта, по большей части до кучи добавлено
     QColor                          _backgroundColor;
     QRectF                          _canvasWindow;
@@ -66,13 +65,13 @@ private:
     double                          _canvasHeight;
     std::shared_ptr<GraphicPoint>   _tempPoint;
     std::unique_ptr<GraphicPoint>   _cursorPoint;
-    int                             _floor;
+    int                                  _floor;
     uint8_t                         _pointSize;
     uint8_t                         _gridSize;
     uint8_t                         _scale;
-    bool                            _lineBegins;
-    bool                            _isDragging;
-    bool                            _ctrlPressed;
+    bool                              _lineBegins;
+    bool                             _isDragging;
+    bool                              _ctrlPressed;
 
     void reset();
     QPointF getMousePosition(const QPointF& point);
@@ -101,4 +100,5 @@ private:
     void keyPressEvent(QKeyEvent *event) override;
     void keyReleaseEvent(QKeyEvent *event) override;
     void focusInEvent(QFocusEvent * event) override;
+
 };

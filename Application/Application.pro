@@ -1,4 +1,4 @@
-QT += quick
+QT += quick sql
 CONFIG += c++17
 
 # The following define makes your compiler emit warnings if you use
@@ -13,6 +13,8 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+        src/DataBase/commondatabase.cpp \
+        src/DataBase/connectionmanager.cpp \
         src/GraphicScene/graphicitem.cpp \
         src/GraphicScene/graphicline.cpp \
         src/GraphicScene/graphicpoint.cpp \
@@ -37,6 +39,9 @@ INCLUDEPATH += $$PWD/../shared/include
 LIBS += -L$$PWD/../shared/lib/ -lDataBase
 
 HEADERS += \
+    include/DataBase/commondatabase.h \
+    include/DataBase/connectionmanager.h \
+    include/DataBase/dbtypes.h \
     include/GraphicScene/graphicitem.h \
     include/GraphicScene/graphicline.h \
     include/GraphicScene/graphicpoint.h \

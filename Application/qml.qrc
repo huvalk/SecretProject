@@ -4,8 +4,6 @@
         <file>qml/Pages/MainPage.qml</file>
         <file>qml/Pages/OpenPage.qml</file>
         <file>qml/Pages/qmldir</file>
-        <file>qml/StyleSettings/qmldir</file>
-        <file>qml/StyleSettings/Style.qml</file>
         <file>qml/ResourceProvider/qmldir</file>
         <file>qml/ResourceProvider/Resources.qml</file>
         <file>qml/resources/browse_file.png</file>
@@ -31,7 +29,7 @@
         <file>qml/CustomItems/DefaultCheckBox.qml</file>
         <file>main.qml</file>
         <file>qml/Pages/DrawPage.qml</file>
-        <file>qml/DrawingScene/DrawingScene.qml</file>
-        <file>qml/DrawingScene/qmldir</file>
+        <file>qml/StyleSettings/qmldir</file>
+        <file>qml/StyleSettings/Style.qml</file>
     </qresource>
 </RCC>

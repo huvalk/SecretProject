@@ -80,7 +80,7 @@ void GraphicScene::paint(QPainter* painter)
 
 QString GraphicScene::name() const
 {
-
+    return _name;
 }
 
 QColor GraphicScene::backgroundColor() const
@@ -105,7 +105,11 @@ int GraphicScene::floor() const
 
 void GraphicScene::setName(const QString name)
 {
+    if (_name == name)
+            return;
 
+        _name = name;
+        emit nameChanged(name);
 }
 
 void GraphicScene::setBackgroundColor(const QColor backgroundColor)
@@ -535,4 +539,39 @@ void GraphicScene::focusInEvent(QFocusEvent *event)
     (void)event;
 }
 
+QString GraphicScene::generateJSONScene()
+{
+    _jsonScene = "{";
+    for(auto i = _lines.begin(); i != _lines.end(); ++i)
+    {
+        _jsonScene.append(QString::number(i->first));
+        _jsonScene.append(": { lines: [");
 
+        for(auto& item: i->second)
+        {
+            _jsonScene.append("{");
+            auto point = item->getFirstPoint();
+            _jsonScene.append(QString::number(point.x()));
+            _jsonScene.append(", ");
+            _jsonScene.append(QString::number(point.y()));
+            _jsonScene.append(", ");
+            point = item->getSecondPoint();
+            _jsonScene.append(QString::number(point.x()));
+            _jsonScene.append(", ");
+            _jsonScene.append(QString::number(point.y()));
+            _jsonScene.append("}, ");
+        }
+        if (i->second.size() != 0)
+        {
+            _jsonScene.remove(_jsonScene.size() - 2, 2);
+        }
+        _jsonScene.append("]}, ");
+    }
+    if (_lines.size() != 0)
+    {
+        _jsonScene.remove(_jsonScene.size() - 2, 2);
+    }
+    _jsonScene.append("}");
+
+    return _jsonScene;
+}
