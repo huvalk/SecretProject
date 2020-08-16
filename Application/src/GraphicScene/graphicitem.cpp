@@ -16,14 +16,14 @@ GraphicItem::GraphicItem(const QRectF& boundingRect, bool visable)
 }
 
 GraphicItem::GraphicItem(const QPointF& topLeft, const QPointF& bottomRight, bool visable)
-    : _boundingRect(topLeft, bottomRight),
+    : _boundingRect(QRectF(topLeft, bottomRight).normalized()),
       _visable(visable)
 {
     _boundingRect.adjust(-1, -1, 1, 1);
 }
 
 GraphicItem::GraphicItem(double x1, double y1, double w, double h, bool visable)
-    : _boundingRect(x1, y1, w, h),
+    : _boundingRect(QRectF(x1, y1, w, h).normalized()),
       _visable(visable)
 {
     _boundingRect.adjust(-1, -1, 1, 1);
