@@ -1,5 +1,6 @@
 ﻿#pragma once
 
+#include <GraphicScene/graphiccontainer.h>
 #include <GraphicScene/graphicpoint.h>
 #include <GraphicScene/graphicline.h>
 #include <map>
@@ -24,8 +25,6 @@ class GraphicScene : public QQuickPaintedItem
     Q_PROPERTY(int floor READ floor WRITE setFloor NOTIFY floorChanged)
 
 public:
-    Q_INVOKABLE QString generateJSONScene();
-
     explicit GraphicScene(QQuickItem *parent = nullptr);
     static void registerMe(const std::string& moduleName);
     void paint(QPainter* painter) override;
@@ -52,21 +51,17 @@ signals:
 
 private:
     //TODO Заменить на один мап с очередью на отрисовку
-    std::map<int, std::set<std::shared_ptr<GraphicPoint>>> _points;
-    std::map<int, std::set<std::shared_ptr<GraphicLine>>> _lines;
-    QString                         _jsonScene;
-    QString                         _name;                 // Название объекта, по большей части до кучи добавлено
-    QColor                          _backgroundColor;
-    QRectF                          _canvasWindow;
-    QRectF                          _changeArea;
-    QPointF                         _offset;
+    QString                        _name;                 // Название объекта, по большей части до кучи добавлено
+    QColor                         _backgroundColor;
+    QRectF                         _canvasWindow;
+    QRectF                         _changeArea;
+    QPointF                        _offset;
     QPoint                          _dragPoint;
+    std::unique_ptr<GraphicPoint> _cursorPoint;
+    GraphicContainer         _container;
     double                          _canvasWidth;
     double                          _canvasHeight;
-    std::shared_ptr<GraphicPoint>   _tempPoint;
-    std::unique_ptr<GraphicPoint>   _cursorPoint;
-    int                                  _floor;
-    uint8_t                         _pointSize;
+    int                                _floor;
     uint8_t                         _gridSize;
     uint8_t                         _scale;
     bool                              _lineBegins;
@@ -83,13 +78,8 @@ private:
     void dragEnds(const QPoint& pos);
     bool cursorShadow(const QPointF& pos);
     bool lineAttachment(const QPointF& pos);
-    std::shared_ptr<GraphicPoint> findPoint(const QPointF& pos);
-    std::shared_ptr<GraphicLine> findLine(const QPointF& pos);
-    bool addPoint(const QPointF &pos);
-    bool addLine(const QPointF &pos);
-    bool deleteItem(const QPointF &pos);
-    void extendChangeArea(const QRectF& newRect);
     void drawGrid(QPainter* painter);
+    void extendChangeArea(const QRectF& newRect);
 
     void geometryChanged(const QRectF &newGeometry, const QRectF &oldGeometry) override;
     void mousePressEvent(QMouseEvent *event) override;

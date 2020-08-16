@@ -8,7 +8,6 @@
 
 GraphicScene::GraphicScene(QQuickItem *parent):
     QQuickPaintedItem(parent),
-    _backgroundColor(Qt::black),
     _canvasWindow(),
     _changeArea(_canvasWindow),
     _offset(0, 0),
@@ -16,16 +15,15 @@ GraphicScene::GraphicScene(QQuickItem *parent):
     _canvasWidth(),
     _canvasHeight(),
     _floor(1),
-    _pointSize(5),
     _gridSize(16),
     _scale(2),
     _lineBegins(false),
     _isDragging(false),
     _ctrlPressed(false)
 {
-    _points.emplace(std::make_pair(_floor, std::set<std::shared_ptr<GraphicPoint>>{}));
-    _lines.emplace(std::make_pair(_floor, std::set<std::shared_ptr<GraphicLine>>{}));
-    _cursorPoint = std::make_unique<GraphicPoint>(0, 0, _pointSize, 2, QColor("#A60000"), QColor("#FF9E00"));
+//    _points.emplace(std::make_pair(_floor, std::set<std::shared_ptr<GraphicPoint>>{}));
+//    _lines.emplace(std::make_pair(_floor, std::set<std::shared_ptr<GraphicLine>>{}));
+    _cursorPoint = std::make_unique<GraphicPoint>(0, 0, 5, 2, QColor("#A60000"), QColor("#FF9E00"));
 
     forceActiveFocus();
     setAcceptHoverEvents(true);
@@ -47,32 +45,12 @@ void GraphicScene::paint(QPainter* painter)
 
     //TODO избавиться от changeArea пока
     painter->setRenderHint(QPainter::Antialiasing, true);
-    auto currentFloorLines = _lines.find(_floor);
-    if (currentFloorLines != _lines.end())
-    {
-        for (auto item: currentFloorLines->second)
-        {
-            if (item->redrawRequest(_canvasWindow))
-            {
-                item->paint(painter, _offset, _scale);
-            }
-        }
-    }
+    _container.paintLines(_floor, _scale, _offset, _canvasWindow, painter);
 
     if (!_isDragging)
     {
         painter->setRenderHint(QPainter::Antialiasing, false);
-        auto currentFloorPoints = _points.find(_floor);
-        if (currentFloorPoints != _points.end())
-        {
-            for (auto item: currentFloorPoints->second)
-            {
-                if (item->redrawRequest(_canvasWindow))
-                {
-                    item->paint(painter, _offset, _scale);
-                }
-            }
-        }
+        _container.paintPoints(_floor, _scale, _offset, _canvasWindow, painter);
 
         _cursorPoint->paint(painter, _offset, _scale);
     }
@@ -216,151 +194,18 @@ bool GraphicScene::lineAttachment(const QPointF &pos)
         return false;
     }
 
-    auto currentFloor = _lines.find(_floor);
-    if (currentFloor == _lines.end())
+    bool result = false;
+    std::tie(result, virtPos) = _container.lineAttachment(_floor, startX, startY, virtPos / _scale);
+
+    if (result == true)
     {
-        return false;
+        extendChangeArea(_cursorPoint->boundingRect());
+        _cursorPoint->moveTo(virtPos);
     }
 
-    double newX = startX;
-    double newY = startY;
-    double minDistance = std::numeric_limits<double>::max();
-    virtPos = virtPos / _scale;
-
-    for (auto item: currentFloor->second)
-    {
-        if (item->pointInArea(startX, startY))
-        {
-          double pointCrossX = item->getXbyY(startY);
-          double pointCrossY = item->getYbyX(startX);
-          double distanceCrossX = std::hypot((pointCrossX - virtPos.x()),
-                                            (startY - virtPos.y()));
-          double distanceCrossY = std::hypot((startX - virtPos.x()),
-                                             (pointCrossY - virtPos.y()));
-
-          if (distanceCrossX <= distanceCrossY) {
-            if (distanceCrossX < minDistance) {
-              newX = pointCrossX;
-              newY = startY;
-              minDistance = distanceCrossX;
-            }
-          } else if (distanceCrossY < minDistance) {
-            newX = startX;
-            newY = pointCrossY;
-            minDistance = distanceCrossY;
-          }
-        }
-    }
-
-    extendChangeArea(_cursorPoint->boundingRect());
-    _cursorPoint->moveTo(newX, newY);
-
-    return true;
+    return result;
 }
 
-std::shared_ptr<GraphicPoint> GraphicScene::findPoint(const QPointF &pos)
-{
-    //TODO передавать нужный этаж
-    auto currentFloor = _points.find(_floor);
-    if (currentFloor == _points.end())
-    {
-        return nullptr;
-    }
-
-    for (auto item : currentFloor->second)
-    {
-        if (item->wasClicked(pos))
-        {
-            return item;
-        }
-    }
-    return nullptr;
-}
-
-std::shared_ptr<GraphicLine> GraphicScene::findLine(const QPointF &pos)
-{
-    //TODO передавать нужный этаж
-    auto currentFloor = _lines.find(_floor);
-    if (currentFloor == _lines.end())
-    {
-        return nullptr;
-    }
-
-    for (auto item : currentFloor->second)
-    {
-        if (item->wasClicked(pos))
-        {
-            return item;
-        }
-    }
-    return nullptr;
-}
-
-bool GraphicScene::addPoint(const QPointF &pos)
-{
-    _tempPoint = findPoint(pos);
-    if (_tempPoint == nullptr)
-    {
-        _tempPoint = std::make_shared<GraphicPoint>(pos, _pointSize, 2);
-        _points[_floor].insert(_tempPoint);
-    }
-    _lineBegins = true;
-    return true;
-}
-
-bool GraphicScene::addLine(const QPointF &pos)
-{
-    if (_lineBegins)
-    {
-        auto currentFloor = _points.find(_floor);
-        if (currentFloor == _points.end())
-        {
-            return false;
-        }
-
-        if (_tempPoint->wasClicked(pos))
-        {
-            return false;
-        }
-
-        _lines[_floor].emplace(std::make_shared<GraphicLine>(_tempPoint->pos(), pos));
-        currentFloor->second.erase(_tempPoint);
-        currentFloor->second.erase(findPoint(pos));
-        _tempPoint = nullptr;
-        _lineBegins = false;
-
-        return true;
-    }
-
-    return false;
-}
-
-bool GraphicScene::deleteItem(const QPointF &pos)
-{
-    auto point = findPoint(pos);
-
-    if (point != nullptr)
-    {
-        extendChangeArea(point->boundingRect());
-        _points[_floor].erase(point);
-
-        return true;
-    }
-
-    auto line = findLine(pos);
-
-    if (line != nullptr)
-    {
-        extendChangeArea(line->boundingRect());
-        addPoint(line->getFirstPoint());
-        addPoint(line->getSecondPoint());
-        _lines[_floor].erase(line);
-
-        return true;
-    }
-
-    return false;
-}
 
 void GraphicScene::extendChangeArea(const QRectF &newRect)
 {
@@ -417,10 +262,11 @@ void GraphicScene::mousePressEvent(QMouseEvent *event)
     switch (event->button())
     {
     case Qt::LeftButton:
-        result = addPoint(_cursorPoint->pos());
+        std::tie(result, std::ignore) = _container.addPoint(_floor, _cursorPoint->pos());
+        _lineBegins = true;
         break;
     case Qt::RightButton:
-        result = deleteItem(_cursorPoint->pos());
+        std::tie(result, std::ignore)  = _container.deleteItem(_floor, _cursorPoint->pos());
         break;
     default:
         break;
@@ -440,9 +286,10 @@ void GraphicScene::mousePressEvent(QMouseEvent *event)
 void GraphicScene::mouseReleaseEvent(QMouseEvent *event)
 {
     bool result = false;
-    if (event->button() == Qt::LeftButton)
+    if (event->button() == Qt::LeftButton && _lineBegins)
     {
-        result = addLine(_cursorPoint->pos());
+        std::tie(result, std::ignore)  = _container.addLine(_floor, _cursorPoint->pos());
+        _lineBegins = !result;
     }
     if (event->button() == Qt::MidButton)
     {
@@ -537,41 +384,4 @@ void GraphicScene::keyReleaseEvent(QKeyEvent *event)
 void GraphicScene::focusInEvent(QFocusEvent *event)
 {
     (void)event;
-}
-
-QString GraphicScene::generateJSONScene()
-{
-    _jsonScene = "{";
-    for(auto i = _lines.begin(); i != _lines.end(); ++i)
-    {
-        _jsonScene.append(QString::number(i->first));
-        _jsonScene.append(": { lines: [");
-
-        for(auto& item: i->second)
-        {
-            _jsonScene.append("{");
-            auto point = item->getFirstPoint();
-            _jsonScene.append(QString::number(point.x()));
-            _jsonScene.append(", ");
-            _jsonScene.append(QString::number(point.y()));
-            _jsonScene.append(", ");
-            point = item->getSecondPoint();
-            _jsonScene.append(QString::number(point.x()));
-            _jsonScene.append(", ");
-            _jsonScene.append(QString::number(point.y()));
-            _jsonScene.append("}, ");
-        }
-        if (i->second.size() != 0)
-        {
-            _jsonScene.remove(_jsonScene.size() - 2, 2);
-        }
-        _jsonScene.append("]}, ");
-    }
-    if (_lines.size() != 0)
-    {
-        _jsonScene.remove(_jsonScene.size() - 2, 2);
-    }
-    _jsonScene.append("}");
-
-    return _jsonScene;
 }

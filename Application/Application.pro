@@ -15,6 +15,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
         src/DataBase/commondatabase.cpp \
         src/DataBase/connectionmanager.cpp \
+        src/GraphicScene/graphiccontainer.cpp \
         src/GraphicScene/graphicitem.cpp \
         src/GraphicScene/graphicline.cpp \
         src/GraphicScene/graphicpoint.cpp \
@@ -42,6 +43,7 @@ HEADERS += \
     include/DataBase/commondatabase.h \
     include/DataBase/connectionmanager.h \
     include/DataBase/dbtypes.h \
+    include/GraphicScene/graphiccontainer.h \
     include/GraphicScene/graphicitem.h \
     include/GraphicScene/graphicline.h \
     include/GraphicScene/graphicpoint.h \
