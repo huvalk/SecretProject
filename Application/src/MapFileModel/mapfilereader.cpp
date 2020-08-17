@@ -18,8 +18,9 @@ std::vector<MapFile> transform(const std::vector<QVariantList>& source)
     std::vector<MapFile> target;
     std::transform(source.begin(), source.end(), std::back_inserter(target),
                    [](const QVariantList& query) {
-        return MapFile {query[1].toString(),
-                        query[2].toString()};
+        return MapFile {query[0].toInt(),
+                    query[1].toString(),
+                    query[2].toString()};
     });
 
     return target;

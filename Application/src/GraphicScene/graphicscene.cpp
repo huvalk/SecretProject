@@ -21,8 +21,6 @@ GraphicScene::GraphicScene(QQuickItem *parent):
     _isDragging(false),
     _ctrlPressed(false)
 {
-//    _points.emplace(std::make_pair(_floor, std::set<std::shared_ptr<GraphicPoint>>{}));
-//    _lines.emplace(std::make_pair(_floor, std::set<std::shared_ptr<GraphicLine>>{}));
     _cursorPoint = std::make_unique<GraphicPoint>(0, 0, 5, 2, QColor("#A60000"), QColor("#FF9E00"));
 
     forceActiveFocus();
@@ -79,6 +77,18 @@ QPointF GraphicScene::offset() const
 int GraphicScene::floor() const
 {
 
+}
+
+QString GraphicScene::generateJSONScene()
+{
+    return _container.generateJSONScene();
+}
+
+bool GraphicScene::parseJSONScene(QString json)
+{
+    auto result = _container.parseJSONScene(json);
+    update();
+    return result;
 }
 
 void GraphicScene::setName(const QString name)

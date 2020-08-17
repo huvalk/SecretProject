@@ -34,6 +34,8 @@ public:
     int scale() const;
     QPointF offset() const;
     int floor() const;
+    Q_INVOKABLE QString generateJSONScene();
+    Q_INVOKABLE bool parseJSONScene(QString json);
 
 public slots:
     void setName(const QString name);

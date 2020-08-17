@@ -109,3 +109,34 @@ int CommonDataBase::saveMapFile(const QString &name)
     return query.lastInsertId().toInt();
 }
 
+QString CommonDataBase::getMap(const int mapID)
+{
+    if (!_connectionManager.isValide())
+    {
+        qCritical() << "Connection to database is not valid";
+        return "";
+    }
+
+    QSqlQuery query {
+        "SELECT map FROM Maps "
+        "WHERE map_id = ?"};
+    query.bindValue(0, mapID);
+
+    if (!query.exec() && query.lastError().isValid())
+    {
+        qCritical() << query.lastError().text();
+        return "";
+    }
+
+    QString result{""};
+    if (query.next())
+    {
+        const QSqlRecord& resultRecord {query.record()};
+
+        result = resultRecord.value(0).toString();
+    }
+
+
+    return result;
+}
+

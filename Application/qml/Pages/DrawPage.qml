@@ -50,5 +50,23 @@ DefaultPage {
                 database.saveMap(mapID, a);
             }
         }
+
+        DefaultButton {
+            // TODO временная кнопка
+            id: _load
+            height: btnHeight
+            width: btnWidth
+
+            text: "Загрузить"
+            btnOverlayColor: _style.btnPrimaryColor
+            btnPrimaryColor: _style.btnSecondaryColor
+            btnShadow: _style.primaryOpacity
+            btnRadius: _style.btnRadius
+
+            onClicked: {
+               var a = database.getMap(1);
+                _canvas.parseJSONScene(a);
+            }
+        }
     }
 }

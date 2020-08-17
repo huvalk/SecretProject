@@ -1,10 +1,16 @@
 #include "MapFileModel/mapfile.h"
 
-MapFile::MapFile(QString tag, QString name)
-    : _tag {std::move(tag)},
+MapFile::MapFile(int id, QString tag, QString name)
+    : _id(id),
+      _tag {std::move(tag)},
       _name {std::move(name)}
 {
 
+}
+
+int MapFile::id() const
+{
+    return _id;
 }
 
 QString MapFile::tag() const

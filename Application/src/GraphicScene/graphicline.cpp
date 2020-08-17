@@ -70,9 +70,9 @@ bool GraphicLine::wasClicked(const double x, const double y, const uint8_t scale
     return false;
 }
 
-GraphicType GraphicLine::type()
+GraphicTypes::GraphicItems GraphicLine::type()
 {
-    return GraphicType::Line;
+    return GraphicTypes::GraphicItems::Line;
 }
 
 void GraphicLine::paint(QPainter *painter, const QPointF &offset, const uint8_t scale)

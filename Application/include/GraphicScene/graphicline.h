@@ -11,7 +11,7 @@ public:
     bool redrawRequest(const QRectF& changeArea) override;
     bool wasClicked(const QPointF& pos, const uint8_t scale = 1) override;
     bool wasClicked(const double x, const double y, const uint8_t scale = 1) override;
-    GraphicType type() override;
+    GraphicTypes::GraphicItems type() override;
     void paint(QPainter* painter, const QPointF& offset, const uint8_t scale) override;
     void moveTo(const QPointF& offset) override;
     void moveTo(const double x, const double y) override;

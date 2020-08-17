@@ -57,9 +57,9 @@ bool GraphicPoint::wasClicked(const double x, const double y, const uint8_t scal
     return false;
 }
 
-GraphicType GraphicPoint::type()
+GraphicTypes::GraphicItems GraphicPoint::type()
 {
-    return GraphicType::Point;
+    return GraphicTypes::GraphicItems::Point;
 }
 
 void GraphicPoint::paint(QPainter *painter, const QPointF &offset, const uint8_t scale)

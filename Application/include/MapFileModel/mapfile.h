@@ -6,12 +6,14 @@ class MapFile
 {
 public:
     MapFile() = default;
-    MapFile(QString tag, QString name);
+    MapFile(int id, QString tag, QString name);
 
+    int id() const;
     QString tag() const;
     QString name() const;
 
 private:
+    int         _id;
     QString _tag;
     QString _name;
 };

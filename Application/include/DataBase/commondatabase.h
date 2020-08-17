@@ -27,6 +27,8 @@ private:
     ConnectionManager& _connectionManager;
 
 public slots:
+    // TODO переместить базу данных в с++ объекты
     bool saveMap(const int mapID, const QString& jsonMap);
     int saveMapFile(const QString& name);
+    QString getMap(const int mapID);
 };

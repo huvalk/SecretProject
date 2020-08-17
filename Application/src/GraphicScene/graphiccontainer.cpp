@@ -174,69 +174,46 @@ std::pair<bool, QRectF> GraphicContainer::deleteItem(const int floor, const QPoi
     return std::make_pair(false, QRectF());
 }
 
-std::map<int, std::set<std::shared_ptr<GraphicPoint>>>::iterator GraphicContainer::findPoints(const int floor)
+GraphicTypes::floor<GraphicPoint>::iterator GraphicContainer::findPoints(const int floor)
 {
     return _points.find(floor);
 }
 
-std::map<int, std::set<std::shared_ptr<GraphicPoint>>>::iterator GraphicContainer::beginPoints()
+GraphicTypes::floor<GraphicPoint>::iterator GraphicContainer::beginPoints()
 {
     return _points.begin();
 }
 
-std::map<int, std::set<std::shared_ptr<GraphicPoint>>>::iterator GraphicContainer::endPoints()
+GraphicTypes::floor<GraphicPoint>::iterator GraphicContainer::endPoints()
 {
     return _points.end();
 }
 
-std::map<int, std::set<std::shared_ptr<GraphicLine>>>::iterator GraphicContainer::findLines(const int floor)
+GraphicTypes::floor<GraphicLine>::iterator GraphicContainer::findLines(const int floor)
 {
     return _lines.find(floor);
 }
 
-std::map<int, std::set<std::shared_ptr<GraphicLine>>>::iterator GraphicContainer::beginLines()
+GraphicTypes::floor<GraphicLine>::iterator GraphicContainer::beginLines()
 {
     return _lines.begin();
 }
 
-std::map<int, std::set<std::shared_ptr<GraphicLine>>>::iterator GraphicContainer::endLines()
+GraphicTypes::floor<GraphicLine>::iterator GraphicContainer::endLines()
 {
     return _lines.end();
 }
 
 QString GraphicContainer::generateJSONScene()
 {
-    _jsonScene = "{";
-    for(auto i = _lines.begin(); i != _lines.end(); ++i)
-    {
-        _jsonScene.append(QString::number(i->first));
-        _jsonScene.append(": { lines: [");
+    //TODO доделать
+    return "";
+}
 
-        for(auto& item: i->second)
-        {
-            _jsonScene.append("{");
-            auto point = item->getFirstPoint();
-            _jsonScene.append(QString::number(point.x()));
-            _jsonScene.append(", ");
-            _jsonScene.append(QString::number(point.y()));
-            _jsonScene.append(", ");
-            point = item->getSecondPoint();
-            _jsonScene.append(QString::number(point.x()));
-            _jsonScene.append(", ");
-            _jsonScene.append(QString::number(point.y()));
-            _jsonScene.append("}, ");
-        }
-        if (i->second.size() != 0)
-        {
-            _jsonScene.remove(_jsonScene.size() - 2, 2);
-        }
-        _jsonScene.append("]}, ");
-    }
-    if (_lines.size() != 0)
-    {
-        _jsonScene.remove(_jsonScene.size() - 2, 2);
-    }
-    _jsonScene.append("}");
+bool GraphicContainer::parseJSONScene(QString json)
+{
+    bool result = true;
+    std::tie(result, _lines) = _parser.parseJSONScene(json);
 
-    return _jsonScene;
+    return result;
 }

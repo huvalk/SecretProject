@@ -16,7 +16,7 @@ public:
     virtual bool redrawRequest(const QRectF& changeArea) = 0;
     virtual bool wasClicked(const QPointF& pos, const uint8_t scale) = 0;
     virtual bool wasClicked(const double x, const double y, const uint8_t scale) = 0;
-    virtual GraphicType type() = 0;
+    virtual GraphicTypes::GraphicItems type() = 0;
     virtual void paint(QPainter* painter, const QPointF& offset, const uint8_t scale) = 0;
     virtual void moveTo(const QPointF& offset) = 0;
     virtual void moveTo(const double x, const double y) = 0;

@@ -2,6 +2,8 @@
 
 #include <GraphicScene/graphicpoint.h>
 #include <GraphicScene/graphicline.h>
+#include <GraphicScene/graphictypes.h>
+#include <GraphicScene/graphicparser.h>
 #include <map>
 #include <memory>
 #include <set>
@@ -20,17 +22,20 @@ public:
     std::pair<bool, QRectF> addPoint(const int floor, const QPointF &pos);
     std::pair<bool, QRectF>  addLine(const int floor, const QPointF &pos);
     std::pair<bool, QRectF>  deleteItem(const int floor, const QPointF &pos);
-    std::map<int, std::set<std::shared_ptr<GraphicPoint>>>::iterator findPoints(const int floor);
-    std::map<int, std::set<std::shared_ptr<GraphicPoint>>>::iterator beginPoints();
-    std::map<int, std::set<std::shared_ptr<GraphicPoint>>>::iterator endPoints();
-    std::map<int, std::set<std::shared_ptr<GraphicLine>>>::iterator findLines(const int floor);
-    std::map<int, std::set<std::shared_ptr<GraphicLine>>>::iterator beginLines();
-    std::map<int, std::set<std::shared_ptr<GraphicLine>>>::iterator endLines();
-    Q_INVOKABLE QString generateJSONScene();
+    GraphicTypes::floor<GraphicPoint>::iterator findPoints(const int floor);
+    GraphicTypes::floor<GraphicPoint>::iterator beginPoints();
+    GraphicTypes::floor<GraphicPoint>::iterator endPoints();
+    GraphicTypes::floor<GraphicLine>::iterator findLines(const int floor);
+    GraphicTypes::floor<GraphicLine>::iterator beginLines();
+    GraphicTypes::floor<GraphicLine>::iterator endLines();
+    QString generateJSONScene();
+    bool parseJSONScene(QString json);
+
 private:
-    std::map<int, std::set<std::shared_ptr<GraphicPoint>>>  _points;
-    std::map<int, std::set<std::shared_ptr<GraphicLine>>>   _lines;
-    QString                                                                               _jsonScene;
-    std::shared_ptr<GraphicPoint>                                          _tempPoint;
-    uint8_t                         _pointSize;
+    GraphicParser                                      _parser;
+    GraphicTypes::floor<GraphicPoint>  _points;
+    GraphicTypes::floor<GraphicLine>   _lines;
+    QString                                                _jsonScene;
+    std::shared_ptr<GraphicPoint>           _tempPoint;
+    uint8_t                                                 _pointSize;
 };
