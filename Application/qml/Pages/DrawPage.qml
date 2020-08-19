@@ -86,11 +86,10 @@ DefaultPage {
             anchors.top: _downFloor.bottom
             anchors.right: parent.right
             anchors.left: parent.left
-            anchors.bottom: _saveMapBtn.top
+            anchors.bottom: _backBtn.top
 
             onCurrentIndexChanged: {
                 _canvas.setFloor(getFloor(currentIndex))
-                console.log(getFloor(currentIndex))
             }
         }
 
@@ -99,7 +98,7 @@ DefaultPage {
             id: _saveMapBtn
             height: btnHeight
             width: btnWidth
-            anchors.bottom: parent.bottom
+            anchors.bottom: _backBtn.top
 
             text: "Сохранить"
             btnOverlayColor: _style.btnPrimaryColor
@@ -111,6 +110,25 @@ DefaultPage {
             onClicked: {
                var a = _canvas.generateJSONScene();
                 database.saveMap(mapID, a);
+            }
+        }
+
+        DefaultButton {
+            // под размер картинки 96*47
+            id: _backBtn
+            height: btnHeight
+            width: btnWidth
+            anchors.bottom: parent.bottom
+
+            text: "Назад"
+            btnOverlayColor: _style.btnPrimaryColor
+            btnPrimaryColor: _style.btnSecondaryColor
+    //        btnIconSource: Resources.images.browseFileIcon
+            btnShadow: _style.primaryOpacity
+            btnRadius: _style.btnRadius
+
+            onClicked: {
+               backBtnClicked()
             }
         }
     }

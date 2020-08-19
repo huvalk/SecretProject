@@ -47,10 +47,33 @@ QVariant MapFloorsModel::data(const QModelIndex &index, int role) const
 
 bool MapFloorsModel::updateMapFloors(QVector<int> mapFloors)
 {
-    beginInsertRows(QModelIndex(), 0, mapFloors.size() - 1);
-    _floors = mapFloors.toStdVector();
-    std::sort(_floors.begin(), _floors.end());
-    endInsertRows();
+    auto oldRows = static_cast<int>(_floors.size());
+    auto newRows = mapFloors.size();
+    auto difRows = newRows - oldRows;
+    if (difRows > 0)
+    {
+        beginInsertRows(QModelIndex(), oldRows, newRows - 1);
+    } else if (difRows < 0)
+    {
+        beginRemoveRows(QModelIndex(), newRows, oldRows - 1);
+    }
+
+    if (mapFloors.size() != 0)
+    {
+        _floors = mapFloors.toStdVector();
+        std::sort(_floors.begin(), _floors.end());
+    } else
+    {
+        beginInsertRows(QModelIndex(), 0, 0);
+        _floors.push_back(1);
+    }
+    if (difRows > 0)
+    {
+        endInsertRows();
+    } else if (difRows < 0)
+    {
+        endRemoveRows();
+    }
     emit dataChanged(createIndex(0, 0), createIndex(static_cast<int>(_floors.size()), 0));
 
     return true;
@@ -58,6 +81,15 @@ bool MapFloorsModel::updateMapFloors(QVector<int> mapFloors)
 
 int MapFloorsModel::upFloor(int index)
 {
+    if (_floors.size() == 0)
+    {
+        beginInsertRows(QModelIndex(), 0, 0);
+        _floors.push_back(1);
+        endInsertRows();
+        emit dataChanged(createIndex(0, 0), createIndex(0, 0));
+        return 0;
+    }
+
     auto currentFloor = _floors[static_cast<size_t>(index)];
     if (currentFloor > 99)
     {
@@ -95,6 +127,15 @@ int MapFloorsModel::upFloor(int index)
 
 int MapFloorsModel::downFloor(int index)
 {
+    if (_floors.size() == 0)
+    {
+        beginInsertRows(QModelIndex(), 0, 0);
+        _floors.push_back(1);
+        endInsertRows();
+        emit dataChanged(createIndex(0, 0), createIndex(0, 0));
+        return 0;
+    }
+
     auto currentFloor = _floors[static_cast<size_t>(index)];
     if (currentFloor < -99)
     {

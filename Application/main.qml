@@ -59,6 +59,7 @@ Window {
 
         onCreateNewClicked: {
             _drawPage.mapID = _openPage.openedMapID
+            _drawPage.uploadMap()
             _stackView.push(_drawPage)
             _mainWindow.visibility = Window.Maximized
         }
@@ -84,6 +85,10 @@ Window {
         visible: false
         defBtnColor: _style.btnPrimaryColor
         altBtnColor: _style.btnSecondaryColor
+
+        onBackBtnClicked: {
+            _stackView.pop()
+        }
     }
 
     FileDialog {

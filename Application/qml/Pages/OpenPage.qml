@@ -160,7 +160,6 @@ DefaultPage {
                 btnRadius: _style.btnRadius
 
                 onClicked: {
-                    console.log()
                     openedMapID = _searchView.currentMapFileID()
                     root.openFileClicked()
                 }

@@ -221,6 +221,11 @@ std::pair<bool, QVector<int> > GraphicContainer::parseJSONScene(QString json)
         {
             floors.push_back(it->first);
         }
+
+        if (floors.size() == 0)
+        {
+            floors.push_back(1);
+        }
     }
 
     return std::make_pair(result, std::move(floors));

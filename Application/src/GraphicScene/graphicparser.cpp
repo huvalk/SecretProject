@@ -123,7 +123,7 @@ std::pair<bool, GraphicTypes::floor<GraphicLine>> GraphicParser::parseJSONScene(
             if (subStr[0] == '}')
             {
                 subStr = eraseSymbol(1, subStr);
-                state = 7;
+                state = 6;
             } else if (std::tie(noErr, subStr, currentFloor) = parseNumber(subStr); noErr)
             {
                 state = 2;
