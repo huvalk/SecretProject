@@ -1,0 +1,3 @@
+module MapFloorsView
+MapFloorsDelegate 1.0 MapFloorsDelegate.qml
+MapFloorsView 1.0 MapFloorsView.qml

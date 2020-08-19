@@ -60,6 +60,14 @@ Window {
         onCreateNewClicked: {
             _drawPage.mapID = _openPage.openedMapID
             _stackView.push(_drawPage)
+            _mainWindow.visibility = Window.Maximized
+        }
+
+        onOpenFileClicked: {
+            _drawPage.mapID = _openPage.openedMapID
+            _drawPage.uploadMap()
+            _stackView.push(_drawPage)
+            _mainWindow.visibility = Window.Maximized
         }
 
         onBrowseFileClicked: {

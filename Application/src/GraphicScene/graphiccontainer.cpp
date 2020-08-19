@@ -206,14 +206,22 @@ GraphicTypes::floor<GraphicLine>::iterator GraphicContainer::endLines()
 
 QString GraphicContainer::generateJSONScene()
 {
-    //TODO доделать
-    return "";
+    return _parser.generateJSONScene(_lines);
 }
 
-bool GraphicContainer::parseJSONScene(QString json)
+std::pair<bool, QVector<int> > GraphicContainer::parseJSONScene(QString json)
 {
     bool result = true;
     std::tie(result, _lines) = _parser.parseJSONScene(json);
 
-    return result;
+    QVector<int> floors{};
+    if (result)
+    {
+        for(auto it = _lines.begin(); it != _lines.end(); ++it)
+        {
+            floors.push_back(it->first);
+        }
+    }
+
+    return std::make_pair(result, std::move(floors));
 }

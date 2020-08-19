@@ -69,11 +69,13 @@ bool CommonDataBase::saveMap(const int mapID, const QString &jsonMap)
     }
 
     QSqlQuery query {
-        "INSERT INTO Maps VALUES (?, ?)"
+        "UPDATE Maps "
+        "SET map = ? "
+        "WHERE map_id = ?"
     };
 
-    query.bindValue(0, mapID);
-    query.bindValue(1, jsonMap);
+    query.bindValue(0, jsonMap);
+    query.bindValue(1, mapID);
 
     bool result {true};
 
@@ -94,19 +96,35 @@ int CommonDataBase::saveMapFile(const QString &name)
         return false;
     }
 
-    QSqlQuery query {
+    QSqlQuery queryMapFiles {
         "INSERT INTO MapFiles (map_name) VALUES (?)"
     };
 
-    query.bindValue(0, name);
+    queryMapFiles.bindValue(0, name);
 
-    if (!query.exec() && query.lastError().isValid())
+    if (!queryMapFiles.exec() && queryMapFiles.lastError().isValid())
     {
-        qCritical() << query.lastError().text();
+        qCritical() << queryMapFiles.lastError().text();
         return -1;
     }
 
-    return query.lastInsertId().toInt();
+    auto mapID = queryMapFiles.lastInsertId().toInt();
+
+    QSqlQuery queryMaps {
+        "INSERT INTO Maps VALUES (?, '{}')"
+    };
+
+    queryMaps.bindValue(0, mapID);
+
+    bool result {true};
+
+    if (!queryMaps.exec() && queryMaps.lastError().isValid())
+    {
+        qCritical() << queryMaps.lastError().text();
+        result = false;
+    }
+
+    return mapID;
 }
 
 QString CommonDataBase::getMap(const int mapID)

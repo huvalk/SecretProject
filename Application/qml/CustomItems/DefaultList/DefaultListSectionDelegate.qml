@@ -4,7 +4,7 @@ import StyleSettings 1.0
 Rectangle {
     width: container.width
     height: childrenRect.height
-    color: "white"
+    color: "transparent"
 
     Text {
         color: _style.textColor

@@ -5,6 +5,43 @@ GraphicParser::GraphicParser()
 
 }
 
+QString GraphicParser::generateJSONScene(const GraphicTypes::floor<GraphicLine> &scene)
+{
+    QString _jsonScene = "{";
+        for(auto i = scene.begin(); i != scene.end(); ++i)
+        {
+            _jsonScene.append(QString::number(i->first));
+            _jsonScene.append(": { lines: [");
+
+            for(auto& item: i->second)
+            {
+                _jsonScene.append("{");
+                auto point = item->getFirstPoint();
+                _jsonScene.append(QString::number(point.x()));
+                _jsonScene.append(", ");
+                _jsonScene.append(QString::number(point.y()));
+                _jsonScene.append(", ");
+                point = item->getSecondPoint();
+                _jsonScene.append(QString::number(point.x()));
+                _jsonScene.append(", ");
+                _jsonScene.append(QString::number(point.y()));
+                _jsonScene.append("}, ");
+            }
+            if (i->second.size() != 0)
+            {
+                _jsonScene.remove(_jsonScene.size() - 2, 2);
+            }
+            _jsonScene.append("]}, ");
+        }
+        if (scene.size() != 0)
+        {
+            _jsonScene.remove(_jsonScene.size() - 2, 2);
+        }
+        _jsonScene.append("}");
+
+        return _jsonScene;
+}
+
 QStringRef GraphicParser::eraseSpaces(QStringRef &json)
 {
     int i = 0;
@@ -68,7 +105,7 @@ std::pair<bool, GraphicTypes::floor<GraphicLine>> GraphicParser::parseJSONScene(
     GraphicTypes::floor<GraphicLine> points;
 
     subStr = eraseSpaces(subStr);
-    while (subStr.size() != 0 && state != 7 && noErr)
+    while (subStr.size() != 0 && state != 6 && noErr)
     {
         switch (state) {
         case 0:
@@ -126,6 +163,7 @@ std::pair<bool, GraphicTypes::floor<GraphicLine>> GraphicParser::parseJSONScene(
                 state = 6;
             } else if (std::tie(noErr, subStr, resLines)  =  parseLines(subStr); noErr)
             {
+                points[currentFloor] = std::move(resLines);
                 state = 5;
             } else
             {
@@ -134,18 +172,6 @@ std::pair<bool, GraphicTypes::floor<GraphicLine>> GraphicParser::parseJSONScene(
             break;
 
         case 5:
-             if (subStr[0] == '}')
-            {
-                points[currentFloor] = std::move(resLines);
-                subStr = eraseSymbol(1, subStr);
-                state = 6;
-            } else
-            {
-                noErr = false;
-            }
-            break;
-
-        case 6:
             if (subStr[0] == ',')
             {
                 subStr = eraseSymbol(1, subStr);
@@ -153,7 +179,7 @@ std::pair<bool, GraphicTypes::floor<GraphicLine>> GraphicParser::parseJSONScene(
             } else if (subStr[0] == '}')
             {
                 subStr = eraseSymbol(1, subStr);
-                state = 7;
+                state = 6;
             } else
             {
                 noErr = false;
@@ -164,7 +190,7 @@ std::pair<bool, GraphicTypes::floor<GraphicLine>> GraphicParser::parseJSONScene(
         subStr = eraseSpaces(subStr);
     }
 
-    return std::make_pair((noErr && state == 7), std::move(points));
+    return std::make_pair((noErr && state == 6), std::move(points));
 }
 
 std::tuple<bool, QStringRef, std::set<std::shared_ptr<GraphicLine>>> GraphicParser::parseLines(QStringRef &json)

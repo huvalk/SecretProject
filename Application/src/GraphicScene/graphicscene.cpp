@@ -76,7 +76,7 @@ QPointF GraphicScene::offset() const
 
 int GraphicScene::floor() const
 {
-
+    return _floor;
 }
 
 QString GraphicScene::generateJSONScene()
@@ -87,8 +87,13 @@ QString GraphicScene::generateJSONScene()
 bool GraphicScene::parseJSONScene(QString json)
 {
     auto result = _container.parseJSONScene(json);
-    update();
-    return result;
+    if (result.first)
+    {
+        emit mapChanged(result.second);
+        update();
+    }
+
+    return result.first;
 }
 
 void GraphicScene::setName(const QString name)
@@ -117,7 +122,14 @@ void GraphicScene::setOffset(const QPointF offset)
 
 void GraphicScene::setFloor(const int floor)
 {
+    if (_floor == floor)
+    {
+        return;
+    }
 
+    _floor = floor;
+    update();
+    emit floorChanged(floor);
 }
 
 void GraphicScene::reset()

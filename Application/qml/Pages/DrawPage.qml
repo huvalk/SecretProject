@@ -1,10 +1,19 @@
 import QtQuick 2.0
 import QtQuick.Controls 2.12
 import CustomItems 1.0
+import CustomItems.DefaultList 1.0
+import MapFloorsView 1.0
 import GraphicScene 1.0
 
 DefaultPage {
     property int mapID
+    function uploadMap() {
+        // TODO переместитьбазу данных в c++
+        if ( _canvas.parseJSONScene( database.getMap(mapID) ) ) {
+
+        }
+    }
+
     defaultFocusItem: _canvas
 
     Rectangle {
@@ -20,13 +29,15 @@ DefaultPage {
             id: _canvas
             anchors.fill: parent
             focus: true
-
-            name: "clock"
             backgroundColor: "whiteSmoke"
+
+            onMapChanged: {
+                _floorsView.updateMapFloors(floors)
+            }
         }
     }
 
-    Column {
+    Item {
         anchors.top: parent.top
         anchors.right: parent.right
         anchors.bottom: parent.bottom
@@ -34,9 +45,61 @@ DefaultPage {
 
         DefaultButton {
             // под размер картинки 96*47
+            id: _upFloor
+            height: btnHeight
+            width: btnWidth
+            anchors.top: parent.top
+
+            text: "Выше"
+            btnOverlayColor: _style.btnPrimaryColor
+            btnPrimaryColor: _style.btnSecondaryColor
+    //        btnIconSource: Resources.images.browseFileIcon
+            btnShadow: _style.primaryOpacity
+            btnRadius: 0
+
+            onClicked: {
+                _floorsView.upFloor()
+            }
+        }
+
+        DefaultButton {
+            // под размер картинки 96*47
+            id: _downFloor
+            height: btnHeight
+            width: btnWidth
+            anchors.top: _upFloor.bottom
+
+            text: "Ниже"
+            btnOverlayColor: _style.btnPrimaryColor
+            btnPrimaryColor: _style.btnSecondaryColor
+    //        btnIconSource: Resources.images.browseFileIcon
+            btnShadow: _style.primaryOpacity
+            btnRadius: 0
+
+            onClicked: {
+                _floorsView.downFloor()
+            }
+        }
+
+        MapFloorsView {
+            id: _floorsView
+            anchors.top: _downFloor.bottom
+            anchors.right: parent.right
+            anchors.left: parent.left
+            anchors.bottom: _saveMapBtn.top
+
+            onCurrentIndexChanged: {
+                _canvas.setFloor(getFloor(currentIndex))
+                console.log(getFloor(currentIndex))
+            }
+        }
+
+        DefaultButton {
+            // под размер картинки 96*47
             id: _saveMapBtn
             height: btnHeight
             width: btnWidth
+            anchors.bottom: parent.bottom
 
             text: "Сохранить"
             btnOverlayColor: _style.btnPrimaryColor
@@ -48,24 +111,6 @@ DefaultPage {
             onClicked: {
                var a = _canvas.generateJSONScene();
                 database.saveMap(mapID, a);
-            }
-        }
-
-        DefaultButton {
-            // TODO временная кнопка
-            id: _load
-            height: btnHeight
-            width: btnWidth
-
-            text: "Загрузить"
-            btnOverlayColor: _style.btnPrimaryColor
-            btnPrimaryColor: _style.btnSecondaryColor
-            btnShadow: _style.primaryOpacity
-            btnRadius: _style.btnRadius
-
-            onClicked: {
-               var a = database.getMap(1);
-                _canvas.parseJSONScene(a);
             }
         }
     }

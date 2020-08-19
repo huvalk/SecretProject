@@ -6,6 +6,7 @@ import ResourceProvider 1.0
 import QtGraphicalEffects 1.0
 
 DefaultListDelegate {
+    property int mapFileID: mapID
     id: root
 
     ImageBubble {

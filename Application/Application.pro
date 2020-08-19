@@ -24,7 +24,8 @@ SOURCES += \
         src/MapFileModel/mapfile.cpp \
         src/MapFileModel/mapfilemodel.cpp \
         src/MapFileModel/mapfilereader.cpp \
-        main.cpp
+        main.cpp \
+        src/MapFloorsModel/mapfloorsmodel.cpp
 
 RESOURCES += qml.qrc
 
@@ -53,7 +54,8 @@ HEADERS += \
     include/GraphicScene/graphictypes.h \
     include/MapFileModel/mapfile.h \
     include/MapFileModel/mapfilemodel.h \
-    include/MapFileModel/mapfilereader.h
+    include/MapFileModel/mapfilereader.h \
+    include/MapFloorsModel/mapfloorsmodel.h
 
 DISTFILES += \
     dependencies.pri

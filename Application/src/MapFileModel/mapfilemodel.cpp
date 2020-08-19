@@ -18,6 +18,7 @@ void MapFileModel::registerMe(const std::string& moduleName)
 QHash<int, QByteArray> MapFileModel::roleNames() const
 {
     QHash<int, QByteArray> roles;
+    roles[MapFileRole::MapID] = "mapID";
     roles[MapFileRole::TagRole] = "tag";
     roles[MapFileRole::NameRole] = "name";
 
@@ -40,6 +41,9 @@ QVariant MapFileModel::data(const QModelIndex &index, int role) const
     const MapFile& map_file {_files.at(static_cast<size_t>(index.row()))};
 
     switch (role) {
+    case MapFileRole::MapID: {
+        return QVariant::fromValue(map_file.id());
+    }
     case MapFileRole::TagRole: {
         return QVariant::fromValue(map_file.tag());
     }
@@ -49,6 +53,11 @@ QVariant MapFileModel::data(const QModelIndex &index, int role) const
     default:
         return true;
     }
+}
+
+int MapFileModel::getMapFileID(int index) const
+{
+    return _files[static_cast<size_t>(index)].id();
 }
 
 bool MapFileModel::updateMapFiles()
@@ -64,5 +73,3 @@ bool MapFileModel::updateMapFiles()
 
     return requestResult;
 }
-
-

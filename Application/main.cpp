@@ -4,6 +4,7 @@
 #include "DataBase/commondatabase.h"
 #include "GraphicScene/graphicscene.h"
 #include "MapFileModel/mapfilemodel.h"
+#include "MapFloorsModel/mapfloorsmodel.h"
 
 int main(int argc, char *argv[])
 {
@@ -13,6 +14,7 @@ int main(int argc, char *argv[])
 
     QQmlApplicationEngine engine;
     MapFileModel::registerMe("MapFiles");
+    MapFloorsModel::registerMe("MapFloors");
     GraphicScene::registerMe("GraphicScene");
     engine.addImportPath(":/qml");
     const QUrl url(QStringLiteral("qrc:/main.qml"));

@@ -13,7 +13,7 @@ class GraphicParser
 public:
     GraphicParser();
 
-    QString generateJSONScene();
+    QString generateJSONScene(const GraphicTypes::floor<GraphicLine>& scene);
     std::pair<bool, GraphicTypes::floor<GraphicLine>> parseJSONScene(QString json);
 
 private:

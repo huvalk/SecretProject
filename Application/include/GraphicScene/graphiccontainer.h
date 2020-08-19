@@ -29,7 +29,7 @@ public:
     GraphicTypes::floor<GraphicLine>::iterator beginLines();
     GraphicTypes::floor<GraphicLine>::iterator endLines();
     QString generateJSONScene();
-    bool parseJSONScene(QString json);
+    std::pair<bool, QVector<int>> parseJSONScene(QString json);
 
 private:
     GraphicParser                                      _parser;

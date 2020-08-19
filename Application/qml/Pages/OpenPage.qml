@@ -11,7 +11,8 @@ DefaultPage {
     property int openedMapID
     signal createNewClicked
     signal browseFileClicked
-    defaultFocusItem: _browseFileBtn
+    signal openFileClicked
+    defaultFocusItem: _searchView
 
     id: root
 
@@ -79,7 +80,7 @@ DefaultPage {
                 width: btnWidth
                 height: btnHeight
 
-                text: "Открыть"
+                text: "Создать"
                 btnOverlayColor: _style.btnPrimaryColor
                 btnPrimaryColor: _style.btnSecondaryColor
                 btnShadow: _style.primaryOpacity
@@ -142,6 +143,7 @@ DefaultPage {
                 clip: true
 
                 SearchView {
+                    id: _searchView
                     anchors.fill: parent
                 }
             }
@@ -151,11 +153,17 @@ DefaultPage {
                 height: btnHeight
                 width: btnWidth
 
-                text: "Скачать"
+                text: "Открыть"
                 btnOverlayColor: _style.btnPrimaryColor
                 btnPrimaryColor: _style.btnSecondaryColor
                 btnShadow: _style.primaryOpacity
                 btnRadius: _style.btnRadius
+
+                onClicked: {
+                    console.log()
+                    openedMapID = _searchView.currentMapFileID()
+                    root.openFileClicked()
+                }
             }
         }
 

@@ -31,5 +31,8 @@
         <file>qml/Pages/DrawPage.qml</file>
         <file>qml/StyleSettings/qmldir</file>
         <file>qml/StyleSettings/Style.qml</file>
+        <file>qml/MapFloorsView/qmldir</file>
+        <file>qml/MapFloorsView/MapFloorsDelegate.qml</file>
+        <file>qml/MapFloorsView/MapFloorsView.qml</file>
     </qresource>
 </RCC>

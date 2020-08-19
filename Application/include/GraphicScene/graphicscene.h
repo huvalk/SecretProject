@@ -50,6 +50,7 @@ signals:
     void scaleChanged(const int scale);
     void offsetChanged(const QPointF offset);
     void floorChanged(const int floor);
+    void mapChanged(QVector<int> floors);
 
 private:
     //TODO Заменить на один мап с очередью на отрисовку

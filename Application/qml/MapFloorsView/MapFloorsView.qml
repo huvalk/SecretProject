@@ -2,25 +2,33 @@ import QtQuick 2.6
 import QtQuick.Controls 2.1
 import CustomItems.DefaultList 1.0
 import StyleSettings 1.0
-import MapFiles 1.0
+import MapFloors 1.0
 
 
 DefaultListView {
-    function currentMapFileID()
-    {
-        return _model.getMapFileID(root.currentIndex)
+    function updateMapFloors(floors) {
+        _model.updateMapFloors(floors)
+    }
+    function upFloor() {
+        currentIndex = _model.upFloor(currentIndex)
+    }
+    function downFloor() {
+        currentIndex = _model.downFloor(currentIndex)
+    }
+    function getFloor(index) {
+        return _model.getFloor(index)
     }
 
     id: root
 
-    model: MapFileModel {
+    model: MapFloorsModel {
         id: _model
     }
 
-    delegate: SearchDelegate {
+    delegate: MapFloorsDelegate {
         id: _delegate
         width: root.width - 1.5*_style.defaultSpace
-        height: 70
+        height: 30
         selected: ListView.isCurrentItem
         onDelegateClicked: {
             root.currentIndex = index
