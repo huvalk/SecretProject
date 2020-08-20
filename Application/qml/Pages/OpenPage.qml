@@ -36,35 +36,35 @@ DefaultPage {
         }
 
         Label {
-            text: "<b>Загрузить с диска</b>"
+            text: "<b>Создать новую карту</b>"
         }
         Row {
             DefaultInput {
                 id: _filePathInput
                 color: _style.inputColor
                 height: btnHeight
-                width: _column.width - _browseFileBtn.width
+                width: _column.width // - _browseFileBtn.width
 
                 selectionColor: _style.btnSecondaryColor
             }
 
-            DefaultButton {
-                // под размер картинки 96*47
-                id: _browseFileBtn
-                height: btnHeight
-                width: btnWidth/2
+//            DefaultButton {
+//                // под размер картинки 96*47
+//                id: _browseFileBtn
+//                height: btnHeight
+//                width: btnWidth/2
 
-                btnOverlayColor: _style.btnPrimaryColor
-                btnPrimaryColor: _style.btnSecondaryColor
-                btnIconSource: Resources.images.browseFileIcon
-                btnShadow: _style.primaryOpacity
-                btnRadius: _style.btnRadius
+//                btnOverlayColor: _style.btnPrimaryColor
+//                btnPrimaryColor: _style.btnSecondaryColor
+//                btnIconSource: Resources.images.browseFileIcon
+//                btnShadow: _style.primaryOpacity
+//                btnRadius: _style.btnRadius
 
-                onClicked: {
+//                onClicked: {
 
-                    root.browseFileClicked()
-                }
-            }
+//                    root.browseFileClicked()
+//                }
+//            }
         }
 
         Row {
@@ -72,7 +72,16 @@ DefaultPage {
                 id: _rememberFilePath
                 height: btnHeight
 
-                text: "Запомнить выбор"
+                text: "Параметры по умолчанию"
+
+                onCheckStateChanged: {
+                    if (checked) {
+                        _animateParametrsOpen.start()
+                    } else {
+                        _animateParametrsClose.start()
+                    }
+
+                }
             }
 
             DefaultButton {
@@ -99,7 +108,36 @@ DefaultPage {
         }
 
         Label {
-            text: "<b>Поиск в сети</b>"
+            id: _parametrsLabel
+            opacity: 0.3
+            text: "Параметры"
+        }
+
+        ToolSeparator {
+            Layout.fillWidth: true
+            orientation: Qt.Horizontal
+        }
+
+        PropertyAnimation {
+            id: _animateParametrsOpen
+            target: _parametrsLabel
+            properties: "opacity"
+            from: 0.3
+            to: 1.0
+            duration: 500
+       }
+
+        PropertyAnimation {
+            id: _animateParametrsClose
+            target: _parametrsLabel
+            properties: "opacity"
+            from: 1.0
+            to: 0.3
+            duration: 500
+       }
+
+        Label {
+            text: "<b>Поиск карты</b>"
         }
 
         Row {
@@ -122,7 +160,7 @@ DefaultPage {
 
                 btnOverlayColor: _style.btnPrimaryColor
                 btnPrimaryColor: _style.btnSecondaryColor
-                btnIconSource: Resources.images.searchFileIcon
+                btnIconSource: Resources.images.browseFileIcon
                 btnShadow: _style.primaryOpacity
                 btnRadius: _style.btnRadius
             }

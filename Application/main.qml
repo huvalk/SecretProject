@@ -33,19 +33,19 @@ Window {
             }
         }
 
-        initialItem: _mainPage
+        initialItem: _openPage
     }
 
-    MainPage {
-        id: _mainPage
-        btnMainHeight: _style.btnBigHeight
-        btnMainWidth: _style.btnBigWidth
-        btnHeight: _style.btnSmallHeight
-        btnWidth: _style.btnSmallWidth
+//    MainPage {
+//        id: _mainPage
+//        btnMainHeight: _style.btnBigHeight
+//        btnMainWidth: _style.btnBigWidth
+//        btnHeight: _style.btnSmallHeight
+//        btnWidth: _style.btnSmallWidth
 
-        defBtnColor: _style.btnPrimaryColor
-        altBtnColor: _style.btnSecondaryColor
-    }
+//        defBtnColor: _style.btnPrimaryColor
+//        altBtnColor: _style.btnSecondaryColor
+//    }
 
     OpenPage {
         id: _openPage
