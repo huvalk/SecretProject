@@ -3,3 +3,5 @@ DefaultPage 1.0 DefaultPage.qml
 MainPage 1.0 MainPage.qml
 OpenPage 1.0 OpenPage.qml
 DrawPage 1.0 DrawPage.qml
+LoadPage 1.0 LoadPage.qml
+AuthPage 1.0 AuthPage.qml

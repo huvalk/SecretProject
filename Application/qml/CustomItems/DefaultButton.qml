@@ -12,6 +12,7 @@ Button {
     id: root
 
     background: Rectangle {
+        anchors.fill: parent
         radius: btnRadius
         color: btnPrimaryColor
 

@@ -174,7 +174,7 @@ DefaultPage {
             Rectangle {
                 anchors.top: parent.top
                 anchors.bottom: parent.bottom
-                width: _column.width - _downloadFileBtn.width - _style.defaultSpace
+                width: _column.width - _openFileBtn.width - _style.defaultSpace
 
                 color: _style.inputColor
                 radius: _style.btnRadius
@@ -186,20 +186,41 @@ DefaultPage {
                 }
             }
 
-            DefaultButton {
-                id: _downloadFileBtn
-                height: btnHeight
-                width: btnWidth
+            Column {
+                spacing: _style.defaultSpace
 
-                text: "Открыть"
-                btnOverlayColor: _style.btnPrimaryColor
-                btnPrimaryColor: _style.btnSecondaryColor
-                btnShadow: _style.primaryOpacity
-                btnRadius: _style.btnRadius
+                DefaultButton {
+                    id: _openFileBtn
+                    height: btnHeight
+                    width: btnWidth
 
-                onClicked: {
-                    openedMapID = _searchView.currentMapFileID()
-                    root.openFileClicked()
+                    text: "Просмотр"
+                    btnOverlayColor: _style.btnPrimaryColor
+                    btnPrimaryColor: _style.btnSecondaryColor
+                    btnShadow: _style.primaryOpacity
+                    btnRadius: _style.btnRadius
+
+                    onClicked: {
+                        openedMapID = _searchView.currentMapFileID()
+                        root.openFileClicked()
+                    }
+                }
+
+                DefaultButton {
+                    id: _editFileBtn
+                    height: btnHeight
+                    width: btnWidth
+
+                    text: "Редактор"
+                    btnOverlayColor: _style.btnPrimaryColor
+                    btnPrimaryColor: _style.btnSecondaryColor
+                    btnShadow: _style.primaryOpacity
+                    btnRadius: _style.btnRadius
+
+                    onClicked: {
+                        openedMapID = _searchView.currentMapFileID()
+                        root.openFileClicked()
+                    }
                 }
             }
         }

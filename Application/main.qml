@@ -1,7 +1,6 @@
 import QtQuick 2.12
 import QtQuick.Window 2.12
 import QtQuick.Controls 2.12
-import QtQuick.Dialogs 1.1
 import StyleSettings 1.0
 import CustomItems 1.0
 import SearchList 1.0
@@ -10,8 +9,8 @@ import Pages 1.0
 Window {
     id: _mainWindow
     visible: true
-    minimumWidth: 640
-    minimumHeight: 480
+    minimumWidth: 800
+    minimumHeight: 600
     color: _style.backgroundColor
 
     Style {
@@ -33,7 +32,29 @@ Window {
             }
         }
 
-        initialItem: _openPage
+        initialItem: _loadPage
+    }
+
+    LoadPage {
+        id: _loadPage
+        visible: false
+
+        onBackBtnClicked: {
+            _stackView.push(_openPage)
+        }
+
+        onAuthRequired: {
+            _stackView.push(_authPage)
+        }
+    }
+
+    AuthPage {
+        id: _authPage
+        visible: false
+
+        onBackBtnClicked: {
+            _stackView.push(_openPage)
+        }
     }
 
 //    MainPage {
@@ -55,7 +76,6 @@ Window {
         visible: false
         defBtnColor: _style.btnPrimaryColor
         altBtnColor: _style.btnSecondaryColor
-        openFilePath: _fileDialog.fileUrl
 
         onCreateNewClicked: {
             _drawPage.mapID = _openPage.openedMapID
@@ -72,7 +92,6 @@ Window {
         }
 
         onBrowseFileClicked: {
-            _fileDialog.open()
         }
     }
 
@@ -89,22 +108,5 @@ Window {
         onBackBtnClicked: {
             _stackView.pop()
         }
-    }
-
-    FileDialog {
-        id: _fileDialog
-
-        modality: Qt.WindowModal
-        visible: false
-        title: "Выберете файл с картой"
-        selectExisting: true
-        selectMultiple: false
-        selectFolder: false
-        nameFilters: [ "Data files (*dat)" ]
-        selectedNameFilter: "Data file(*dat)"
-        sidebarVisible: true
-
-        onAccepted: { console.log("Accepted")  }
-        onRejected: { console.log("Rejected") }
     }
 }

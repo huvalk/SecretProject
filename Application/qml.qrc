@@ -34,5 +34,12 @@
         <file>qml/MapFloorsView/qmldir</file>
         <file>qml/MapFloorsView/MapFloorsDelegate.qml</file>
         <file>qml/MapFloorsView/MapFloorsView.qml</file>
+        <file>qml/Pages/LoadPage.qml</file>
+        <file>qml/resources/load_image_holder.jpeg</file>
+        <file>qml/Pages/AuthPage.qml</file>
+        <file>qml/CustomItems/EyeCheckBox.qml</file>
+        <file>qml/resources/eye_closed.png</file>
+        <file>qml/resources/eye_opened.png</file>
+        <file>qml/resources/open_image.png</file>
     </qresource>
 </RCC>

@@ -7,3 +7,4 @@ RoundImage 1.0 RoundImage.qml
 ImageBubble 1.0 ImageBubble.qml
 BaseText 1.0 BaseText.qml
 DefaultCheckBox 1.0 DefaultCheckBox.qml
+EyeCheckBox 1.0 EyeCheckBox.qml

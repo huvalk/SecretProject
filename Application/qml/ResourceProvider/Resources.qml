@@ -8,5 +8,9 @@ Item {
         readonly property string browseFileIcon: "qrc:/qml/resources/browse_file.png"
         readonly property string searchFileIcon: "qrc:/qml/resources/search_file.png"
         readonly property string defaultUserIcon: "qrc:/qml/resources/user_file.png"
+        readonly property string loadImage: "qrc:/qml/resources/load_image_holder.jpeg"
+        readonly property string eyeOpened: "qrc:/qml/resources/eye_opened.png"
+        readonly property string eyeClosed: "qrc:/qml/resources/eye_closed.png"
+        readonly property string openImage: "qrc:/qml/resources/open_image.png"
     }
 }

@@ -1,8 +1,11 @@
 import QtQuick 2.0
 import QtQuick.Controls 2.12
+import QtQuick.Dialogs 1.1
+import QtQuick.Layouts 1.12
 import CustomItems 1.0
 import CustomItems.DefaultList 1.0
 import MapFloorsView 1.0
+import ResourceProvider 1.0
 import GraphicScene 1.0
 
 DefaultPage {
@@ -25,6 +28,13 @@ DefaultPage {
         color: "white"
         focus: true
 
+        Image {
+            id: _backGroundScene
+            anchors.fill: parent
+            source: _fileDialog.fileUrl
+            visible: _backGroundSceneVisable.checked
+        }
+
         GraphicScene {
             id: _canvas
             anchors.fill: parent
@@ -37,18 +47,76 @@ DefaultPage {
         }
     }
 
-    Item {
+    Column {
         anchors.top: parent.top
         anchors.right: parent.right
+        anchors.left: _backGround.right
         anchors.bottom: parent.bottom
         width: btnWidth
+        spacing: _style.defaultSpace
+
+        BaseText {
+            id: _backGroundSceneLabel
+            width: parent.width
+            horizontalAlignment: Text.AlignHCenter
+            verticalAlignment: Text.AlignVCenter
+            text: "Шаблон"
+        }
+
+        Row {
+            EyeCheckBox {
+                id: _backGroundSceneVisable
+            }
+
+            DefaultButton {
+                // под размер картинки 96*47
+                id: _browseBackgroundImage
+                anchors.verticalCenter: parent.verticalCenter
+                width: 26
+                height: 26
+
+                btnOverlayColor: _style.btnPrimaryColor
+                btnPrimaryColor: _style.btnSecondaryColor
+                btnIconSource: Resources.images.openImage
+                btnShadow: _style.primaryOpacity
+                btnRadius: _style.btnRadius
+
+                onClicked: {
+                   _fileDialog.open()
+                }
+            }
+        }
+
+        BaseText {
+            id: _otherFloorLabel
+            width: parent.width
+            horizontalAlignment: Text.AlignHCenter
+            verticalAlignment: Text.AlignVCenter
+            text: "Просветить"
+        }
+
+        Row {
+            EyeCheckBox {
+                id: _otherFloorVisable
+            }
+
+            DefaultInput {
+                id: _otherFloorNumber
+                anchors.verticalCenter: parent.verticalCenter
+                width: 40
+                height: 26
+
+                inputMethodHints: Qt.ImhFormattedNumbersOnly
+                color: _style.inputColor
+                selectionColor: _style.btnSecondaryColor
+            }
+        }
 
         DefaultButton {
             // под размер картинки 96*47
             id: _upFloor
             height: btnHeight
             width: btnWidth
-            anchors.top: parent.top
 
             text: "Выше"
             btnOverlayColor: _style.btnPrimaryColor
@@ -67,7 +135,6 @@ DefaultPage {
             id: _downFloor
             height: btnHeight
             width: btnWidth
-            anchors.top: _upFloor.bottom
 
             text: "Ниже"
             btnOverlayColor: _style.btnPrimaryColor
@@ -83,10 +150,9 @@ DefaultPage {
 
         MapFloorsView {
             id: _floorsView
-            anchors.top: _downFloor.bottom
-            anchors.right: parent.right
-            anchors.left: parent.left
-            anchors.bottom: _backBtn.top
+            width: parent.width
+            height: 300
+            clip: true
 
             onCurrentIndexChanged: {
                 _canvas.setFloor(getFloor(currentIndex))
@@ -98,7 +164,6 @@ DefaultPage {
             id: _saveMapBtn
             height: btnHeight
             width: btnWidth
-            anchors.bottom: _backBtn.top
 
             text: "Сохранить"
             btnOverlayColor: _style.btnPrimaryColor
@@ -118,7 +183,6 @@ DefaultPage {
             id: _backBtn
             height: btnHeight
             width: btnWidth
-            anchors.bottom: parent.bottom
 
             text: "Назад"
             btnOverlayColor: _style.btnPrimaryColor
@@ -128,8 +192,25 @@ DefaultPage {
             btnRadius: _style.btnRadius
 
             onClicked: {
-               backBtnClicked()
+                backBtnClicked()
             }
         }
+    }
+
+    FileDialog {
+        id: _fileDialog
+
+        modality: Qt.WindowModal
+        visible: false
+        title: "Выберете файл с картой"
+        selectExisting: true
+        selectMultiple: false
+        selectFolder: false
+        nameFilters: [ "Image files (*.jpg *.png *.jpeg)", "All files (*)" ]
+        selectedNameFilter: "*"
+        sidebarVisible: true
+
+        onAccepted: { _backGroundScene.source = fileUrl }
+        onRejected: { console.log("Rejected") }
     }
 }
