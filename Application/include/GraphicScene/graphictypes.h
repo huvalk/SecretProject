@@ -7,7 +7,8 @@ namespace GraphicTypes
 {
 enum class GraphicItems {
     Point,
-    Line
+    Line,
+    Image
 };
 
 template <class Item>

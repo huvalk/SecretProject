@@ -7,7 +7,7 @@ GraphicContainer::GraphicContainer()
 
 }
 
-void GraphicContainer::paintLines(const int floor, const uint8_t scale, const QPointF& offset, const  QRectF& area, QPainter* painter)
+void GraphicContainer::paintLines(const int floor, const uint8_t scale, const QPointF& offset, const  QRectF& area, QPainter* painter, const bool bg)
 {
     auto currentFloorLines = _lines.find(floor);
     if (currentFloorLines != _lines.end())
@@ -16,7 +16,7 @@ void GraphicContainer::paintLines(const int floor, const uint8_t scale, const QP
         {
             if (item->redrawRequest(area))
             {
-                item->paint(painter, offset, scale);
+                item->paint(painter, offset, scale, bg);
             }
         }
     }

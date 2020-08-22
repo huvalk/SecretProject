@@ -12,5 +12,9 @@ Item {
         readonly property string eyeOpened: "qrc:/qml/resources/eye_opened.png"
         readonly property string eyeClosed: "qrc:/qml/resources/eye_closed.png"
         readonly property string openImage: "qrc:/qml/resources/open_image.png"
+        readonly property string pinnedImage: "qrc:/qml/resources/pinned.png"
+        readonly property string unpinnedImage: "qrc:/qml/resources/unpinned.png"
+        readonly property string magnetImage: "qrc:/qml/resources/magnet.png"
+        readonly property string unmagnetImage: "qrc:/qml/resources/unmagnet.png"
     }
 }

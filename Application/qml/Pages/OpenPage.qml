@@ -11,6 +11,7 @@ DefaultPage {
     property int openedMapID
     signal createNewClicked
     signal browseFileClicked
+    signal editFileClicked
     signal openFileClicked
     defaultFocusItem: _searchView
 
@@ -219,7 +220,7 @@ DefaultPage {
 
                     onClicked: {
                         openedMapID = _searchView.currentMapFileID()
-                        root.openFileClicked()
+                        root.editFileClicked()
                     }
                 }
             }

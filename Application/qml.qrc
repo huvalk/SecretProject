@@ -7,9 +7,7 @@
         <file>qml/ResourceProvider/qmldir</file>
         <file>qml/ResourceProvider/Resources.qml</file>
         <file>qml/resources/browse_file.png</file>
-        <file>qml/resources/browse_source.xcf</file>
         <file>qml/resources/search_file.png</file>
-        <file>qml/resources/search_source.xcf</file>
         <file>qml/CustomItems/qmldir</file>
         <file>qml/CustomItems/DefaultButton.qml</file>
         <file>qml/CustomItems/DefaultInput.qml</file>
@@ -41,5 +39,10 @@
         <file>qml/resources/eye_closed.png</file>
         <file>qml/resources/eye_opened.png</file>
         <file>qml/resources/open_image.png</file>
+        <file>qml/Pages/ToolBar.qml</file>
+        <file>qml/resources/pinned.png</file>
+        <file>qml/resources/unpinned.png</file>
+        <file>qml/resources/magnet.png</file>
+        <file>qml/resources/unmagnet.png</file>
     </qresource>
 </RCC>

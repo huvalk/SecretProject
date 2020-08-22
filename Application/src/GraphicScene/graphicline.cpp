@@ -75,10 +75,12 @@ GraphicTypes::GraphicItems GraphicLine::type()
     return GraphicTypes::GraphicItems::Line;
 }
 
-void GraphicLine::paint(QPainter *painter, const QPointF &offset, const uint8_t scale)
+void GraphicLine::paint(QPainter *painter, const QPointF &offset, const uint8_t scale, const bool extColor)
 {
-
-    painter->setPen(QPen(QBrush(_fillStyle), 5, Qt::SolidLine, Qt::RoundCap));
+    if (!extColor)
+    {
+        painter->setPen(QPen(QBrush(_fillStyle), 5, Qt::SolidLine, Qt::RoundCap));
+    }
     painter->drawLine(static_cast<int>(_firstPoint.x() * scale - offset.x()),
                       static_cast<int>(_firstPoint.y() * scale - offset.y()),
                       static_cast<int>(_secondPoint.x() * scale - offset.x()),

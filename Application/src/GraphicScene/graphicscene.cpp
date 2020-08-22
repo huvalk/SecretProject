@@ -12,13 +12,19 @@ GraphicScene::GraphicScene(QQuickItem *parent):
     _changeArea(_canvasWindow),
     _offset(0, 0),
     _dragPoint(0, 0),
+    _image(std::make_unique<GraphicImage>(0, 0, "")),
     _canvasWidth(),
     _canvasHeight(),
     _floor(1),
+    _backgroundFloor(1),
+    _mod(EditingMod::CreateWalls),
     _gridSize(16),
     _scale(2),
     _lineBegins(false),
     _isDragging(false),
+    _isBackgroundDragging(false),
+    _backgroundVisible(false),
+    _backgroundFloorVisible(false),
     _ctrlPressed(false)
 {
     _cursorPoint = std::make_unique<GraphicPoint>(0, 0, 5, 2, QColor("#A60000"), QColor("#FF9E00"));
@@ -36,27 +42,35 @@ void GraphicScene::registerMe(const std::string& moduleName)
 
 void GraphicScene::paint(QPainter* painter)
 {
-    if (_scale > 1)
+    if (_scale > 1 && (_mod == EditingMod::CreateWalls || _mod == EditingMod::MagniteToWalls))
     {
         drawGrid(painter);
     }
 
-    //TODO избавиться от changeArea пока
+    if (_backgroundVisible && _image->redrawRequest(_canvasWindow) &&
+            (_mod == EditingMod::CreateWalls || _mod == EditingMod::MagniteToWalls))
+    {
+        _image->paint(painter, _offset, _scale);
+    }
+
     painter->setRenderHint(QPainter::Antialiasing, true);
+    if (_backgroundFloorVisible && _backgroundFloor != _floor &&
+            (_mod == EditingMod::CreateWalls || _mod == EditingMod::MagniteToWalls))
+    {
+        painter->setPen(QPen(QBrush("black"), 8, Qt::SolidLine, Qt::RoundCap));
+        _container.paintLines(_backgroundFloor, _scale, _offset, _canvasWindow, painter, true);
+    }
+
+    //TODO избавиться от changeArea пока
     _container.paintLines(_floor, _scale, _offset, _canvasWindow, painter);
 
-    if (!_isDragging)
+    if (!_isDragging && (_mod == EditingMod::CreateWalls || _mod == EditingMod::MagniteToWalls))
     {
         painter->setRenderHint(QPainter::Antialiasing, false);
         _container.paintPoints(_floor, _scale, _offset, _canvasWindow, painter);
 
         _cursorPoint->paint(painter, _offset, _scale);
     }
-}
-
-QString GraphicScene::name() const
-{
-    return _name;
 }
 
 QColor GraphicScene::backgroundColor() const
@@ -96,18 +110,38 @@ bool GraphicScene::parseJSONScene(QString json)
     return result.first;
 }
 
-void GraphicScene::setName(const QString name)
+void GraphicScene::setBackground(const QString path)
 {
-    if (_name == name)
-            return;
+    QUrl url(path);
 
-        _name = name;
-        emit nameChanged(name);
+    _image->setImage(url.path());
+    update();
 }
 
-void GraphicScene::setBackgroundColor(const QColor backgroundColor)
+void GraphicScene::setMod(const int mod)
 {
+    if (mod >= 0 || mod <= EditingMod::Description)
+    {
+        _mod = mod;
+    }
+}
 
+void GraphicScene::setBackgroundVisible(const bool is)
+{
+    _backgroundVisible = is;
+    update();
+}
+
+void GraphicScene::setBackgroundFloor(const int floor)
+{
+    _backgroundFloor = floor;
+    update();
+}
+
+void GraphicScene::setBackgroundFloorVisible(const bool is)
+{
+    _backgroundFloorVisible = is;
+    update();
 }
 
 void GraphicScene::setScale(const int scale)
@@ -134,7 +168,11 @@ void GraphicScene::setFloor(const int floor)
 
 void GraphicScene::reset()
 {
-
+    _dragPoint.setX(0);
+    _dragPoint.setY(0);
+    _isDragging = false;
+    _isBackgroundDragging = false;
+    // TODO все ли сбрасывается?
 }
 
 QPointF GraphicScene::getMousePosition(const QPointF &point)
@@ -181,6 +219,29 @@ void GraphicScene::dragEnds(const QPoint &pos)
     (void)pos;
 
     _isDragging = false;
+    _cursorPoint->setVisable(true);
+}
+
+void GraphicScene::dragBackgroundBegins(const QPoint &pos)
+{
+    _isBackgroundDragging = true;
+    _dragPoint = pos;
+    _cursorPoint->setVisable(false);
+}
+
+void GraphicScene::dragBackgroundMove(const QPoint &pos)
+{
+    QPointF div = _dragPoint - pos;
+    _offset += div;
+    _image->moveTo(_image->pos() + (div / _scale));
+    _dragPoint = pos;
+}
+
+void GraphicScene::dragBackgroundEnds(const QPoint &pos)
+{
+    (void)pos;
+
+    _isBackgroundDragging = false;
     _cursorPoint->setVisable(true);
 }
 
@@ -281,15 +342,36 @@ void GraphicScene::geometryChanged(const QRectF &newGeometry, const QRectF &oldG
 void GraphicScene::mousePressEvent(QMouseEvent *event)
 {
     bool result = false;
-    switch (event->button())
+    switch (_mod)
     {
-    case Qt::LeftButton:
-        std::tie(result, std::ignore) = _container.addPoint(_floor, _cursorPoint->pos());
-        _lineBegins = true;
+    case EditingMod::CreateWalls:
+    case EditingMod::MagniteToWalls:
+        switch (event->button())
+        {
+        case Qt::LeftButton:
+            std::tie(result, std::ignore) = _container.addPoint(_floor, _cursorPoint->pos());
+            _lineBegins = true;
+            break;
+        case Qt::RightButton:
+            std::tie(result, std::ignore)  = _container.deleteItem(_floor, _cursorPoint->pos());
+            break;
+        default:
+            break;
+        }
         break;
-    case Qt::RightButton:
-        std::tie(result, std::ignore)  = _container.deleteItem(_floor, _cursorPoint->pos());
+
+    case EditingMod::MoveBackground:
+        switch (event->button())
+        {
+        case Qt::LeftButton:
+            dragBackgroundBegins(event->pos());
+            break;
+
+        default:
+            break;
+        }
         break;
+
     default:
         break;
     }
@@ -308,11 +390,33 @@ void GraphicScene::mousePressEvent(QMouseEvent *event)
 void GraphicScene::mouseReleaseEvent(QMouseEvent *event)
 {
     bool result = false;
-    if (event->button() == Qt::LeftButton && _lineBegins)
+    switch (_mod)
     {
-        std::tie(result, std::ignore)  = _container.addLine(_floor, _cursorPoint->pos());
-        _lineBegins = !result;
+    case EditingMod::CreateWalls:
+    case EditingMod::MagniteToWalls:
+        if (event->button() == Qt::LeftButton && _lineBegins)
+        {
+            std::tie(result, std::ignore)  = _container.addLine(_floor, _cursorPoint->pos());
+            _lineBegins = !result;
+        }
+        break;
+
+    case EditingMod::MoveBackground:
+        switch (event->button())
+        {
+        case Qt::LeftButton:
+            dragBackgroundEnds(event->pos());
+            break;
+
+        default:
+            break;
+        }
+        break;
+
+    default:
+        break;
     }
+
     if (event->button() == Qt::MidButton)
     {
         dragEnds(event->pos());
@@ -331,7 +435,11 @@ void GraphicScene::mouseMoveEvent(QMouseEvent *event)
     {
         dragMove(event->pos());
         result = true;
-    } else if (_ctrlPressed)
+    } else if (_isBackgroundDragging)
+    {
+        dragBackgroundMove(event->pos());
+        result = true;
+    } else if (_mod == EditingMod::MagniteToWalls)
     {
         result = lineAttachment(event->pos());
     } else
@@ -365,18 +473,27 @@ void GraphicScene::wheelEvent(QWheelEvent *event)
 void GraphicScene::hoverMoveEvent(QHoverEvent *event)
 {
     bool result = false;
-    if (_ctrlPressed)
+    switch (_mod)
     {
+    case EditingMod::CreateWalls:
+            result = cursorShadow(event->posF());
+            break;
+    case EditingMod::MagniteToWalls:
         result = lineAttachment(event->posF());
-    } else
-    {
-        result = cursorShadow(event->posF());
+        break;
+    default:
+        break;
     }
 
     if (result)
     {
         update();
     }
+}
+
+void GraphicScene::hoverLeaveEvent(QHoverEvent *event)
+{
+    reset();
 }
 
 void GraphicScene::keyPressEvent(QKeyEvent *event)

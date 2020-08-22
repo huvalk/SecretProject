@@ -17,7 +17,7 @@ public:
     virtual bool wasClicked(const QPointF& pos, const uint8_t scale) = 0;
     virtual bool wasClicked(const double x, const double y, const uint8_t scale) = 0;
     virtual GraphicTypes::GraphicItems type() = 0;
-    virtual void paint(QPainter* painter, const QPointF& offset, const uint8_t scale) = 0;
+    virtual void paint(QPainter* painter, const QPointF& offset, const uint8_t scale, const bool extColor) = 0;
     virtual void moveTo(const QPointF& offset) = 0;
     virtual void moveTo(const double x, const double y) = 0;
     virtual QRectF boundingRect();

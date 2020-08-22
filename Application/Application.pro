@@ -16,6 +16,7 @@ SOURCES += \
         src/DataBase/commondatabase.cpp \
         src/DataBase/connectionmanager.cpp \
         src/GraphicScene/graphiccontainer.cpp \
+        src/GraphicScene/graphicimage.cpp \
         src/GraphicScene/graphicitem.cpp \
         src/GraphicScene/graphicline.cpp \
         src/GraphicScene/graphicparser.cpp \
@@ -46,6 +47,7 @@ HEADERS += \
     include/DataBase/connectionmanager.h \
     include/DataBase/dbtypes.h \
     include/GraphicScene/graphiccontainer.h \
+    include/GraphicScene/graphicimage.h \
     include/GraphicScene/graphicitem.h \
     include/GraphicScene/graphicline.h \
     include/GraphicScene/graphicparser.h \

@@ -62,11 +62,14 @@ GraphicTypes::GraphicItems GraphicPoint::type()
     return GraphicTypes::GraphicItems::Point;
 }
 
-void GraphicPoint::paint(QPainter *painter, const QPointF &offset, const uint8_t scale)
+void GraphicPoint::paint(QPainter *painter, const QPointF &offset, const uint8_t scale, const bool extColor)
 {
     //TODO Предварительно прощитывать настоящее положение
-    painter->setPen(QPen(QBrush(_strokeStyle), 1, Qt::SolidLine, Qt::RoundCap));
-    painter->setBrush(QBrush(_fillStyle));
+    if (!extColor)
+    {
+        painter->setPen(QPen(QBrush(_strokeStyle), 1, Qt::SolidLine, Qt::RoundCap));
+        painter->setBrush(QBrush(_fillStyle));
+    }
     painter->drawEllipse((_center * scale - offset), _radius, _radius);
 }
 

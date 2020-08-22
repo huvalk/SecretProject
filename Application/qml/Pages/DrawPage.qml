@@ -10,10 +10,10 @@ import GraphicScene 1.0
 
 DefaultPage {
     property int mapID
-    function uploadMap() {
+    function uploadMap(mod) {
         // TODO переместитьбазу данных в c++
         if ( _canvas.parseJSONScene( database.getMap(mapID) ) ) {
-
+            _canvas.setMod(mod)
         }
     }
 
@@ -28,18 +28,10 @@ DefaultPage {
         color: "white"
         focus: true
 
-        Image {
-            id: _backGroundScene
-            anchors.fill: parent
-            source: _fileDialog.fileUrl
-            visible: _backGroundSceneVisable.checked
-        }
-
         GraphicScene {
             id: _canvas
             anchors.fill: parent
             focus: true
-            backgroundColor: "whiteSmoke"
 
             onMapChanged: {
                 _floorsView.updateMapFloors(floors)
@@ -48,12 +40,36 @@ DefaultPage {
     }
 
     Column {
+        id: _toolBar
         anchors.top: parent.top
         anchors.right: parent.right
         anchors.left: _backGround.right
         anchors.bottom: parent.bottom
         width: btnWidth
         spacing: _style.defaultSpace
+
+        BaseText {
+            id: _cursorLabel
+            width: parent.width
+            horizontalAlignment: Text.AlignHCenter
+            verticalAlignment: Text.AlignVCenter
+            text: "Курсор"
+        }
+
+        Row {
+            EyeCheckBox {
+                id: _isLineAttachment
+                trueIndicator: Resources.images.magnetImage
+                falseIndicator: Resources.images.unmagnetImage
+                onCheckedChanged: {
+                    if (checked) {
+                        _canvas.setMod(1)
+                    } else {
+                        _canvas.setMod(0)
+                    }
+                }
+            }
+        }
 
         BaseText {
             id: _backGroundSceneLabel
@@ -65,25 +81,43 @@ DefaultPage {
 
         Row {
             EyeCheckBox {
-                id: _backGroundSceneVisable
+                id: _isBackGroundSceneVisable
+                trueIndicator: Resources.images.eyeOpened
+                falseIndicator: Resources.images.eyeClosed
+                onCheckedChanged: {
+                    _canvas.setBackgroundVisible(checked)
+                }
             }
 
-            DefaultButton {
-                // под размер картинки 96*47
-                id: _browseBackgroundImage
-                anchors.verticalCenter: parent.verticalCenter
-                width: 26
-                height: 26
-
-                btnOverlayColor: _style.btnPrimaryColor
-                btnPrimaryColor: _style.btnSecondaryColor
-                btnIconSource: Resources.images.openImage
-                btnShadow: _style.primaryOpacity
-                btnRadius: _style.btnRadius
-
-                onClicked: {
-                   _fileDialog.open()
+            EyeCheckBox {
+                id: _isBackGroundMoves
+                trueIndicator: Resources.images.pinnedImage
+                falseIndicator: Resources.images.unpinnedImage
+                onCheckedChanged: {
+                    if (checked) {
+                        _canvas.setMod(2)
+                    } else {
+                        _canvas.setMod(0)
+                    }
                 }
+            }
+        }
+
+        DefaultButton {
+            // под размер картинки 96*47
+            id: _browseBackgroundImage
+            height: btnHeight
+            width: btnWidth
+
+            btnOverlayColor: _style.btnPrimaryColor
+            btnPrimaryColor: _style.btnSecondaryColor
+//            btnIconSource: Resources.images.openImage
+            text: '"Открыть"'
+            btnShadow: _style.primaryOpacity
+            btnRadius: _style.btnRadius
+
+            onClicked: {
+               _fileDialog.open()
             }
         }
 
@@ -98,6 +132,12 @@ DefaultPage {
         Row {
             EyeCheckBox {
                 id: _otherFloorVisable
+
+                trueIndicator: Resources.images.eyeOpened
+                falseIndicator: Resources.images.eyeClosed
+                onCheckedChanged: {
+                    _canvas.setBackgroundFloorVisible(checked)
+                }
             }
 
             DefaultInput {
@@ -109,6 +149,14 @@ DefaultPage {
                 inputMethodHints: Qt.ImhFormattedNumbersOnly
                 color: _style.inputColor
                 selectionColor: _style.btnSecondaryColor
+                placeholderText: "1"
+
+                onTextChanged: {
+                    let floor = parseInt(text)
+                    if (!isNaN(floor)) {
+                        _canvas.setBackgroundFloor(floor)
+                    }
+                }
             }
         }
 
@@ -210,7 +258,7 @@ DefaultPage {
         selectedNameFilter: "*"
         sidebarVisible: true
 
-        onAccepted: { _backGroundScene.source = fileUrl }
+        onAccepted: { _canvas.setBackground(fileUrl )}
         onRejected: { console.log("Rejected") }
     }
 }

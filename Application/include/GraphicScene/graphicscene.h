@@ -3,6 +3,7 @@
 #include <GraphicScene/graphiccontainer.h>
 #include <GraphicScene/graphicpoint.h>
 #include <GraphicScene/graphicline.h>
+#include <GraphicScene/graphicimage.h>
 #include <map>
 #include <memory>
 #include <set>
@@ -18,8 +19,6 @@
 class GraphicScene : public QQuickPaintedItem
 {
     Q_OBJECT
-    Q_PROPERTY(QString name READ name WRITE setName NOTIFY nameChanged)
-    Q_PROPERTY(QColor backgroundColor READ backgroundColor WRITE setBackgroundColor NOTIFY backgroundColorChanged)
     Q_PROPERTY(QPointF offset READ offset WRITE setOffset NOTIFY offsetChanged)
     Q_PROPERTY(int scale READ scale WRITE setScale NOTIFY scaleChanged)
     Q_PROPERTY(int floor READ floor WRITE setFloor NOTIFY floorChanged)
@@ -38,37 +37,48 @@ public:
     Q_INVOKABLE bool parseJSONScene(QString json);
 
 public slots:
-    void setName(const QString name);
-    void setBackgroundColor(const QColor backgroundColor);
     void setScale(const int scale);
     void setOffset(const QPointF offset);
     void setFloor(const int floor);
+    void setBackground(const QString path);
+    void setMod(const int mod);
+    void setBackgroundVisible(const bool is);
+    void setBackgroundFloor(const int floor);
+    void setBackgroundFloorVisible(const bool is);
 
 signals:
-    void nameChanged(const QString name);
-    void backgroundColorChanged(const QColor backgroundColor);
     void scaleChanged(const int scale);
     void offsetChanged(const QPointF offset);
     void floorChanged(const int floor);
     void mapChanged(QVector<int> floors);
 
 private:
-    //TODO Заменить на один мап с очередью на отрисовку
-    QString                        _name;                 // Название объекта, по большей части до кучи добавлено
-    QColor                         _backgroundColor;
+    enum EditingMod {
+        CreateWalls = 0,
+        MagniteToWalls,
+        MoveBackground,
+        Description,
+        Nothing
+    };
     QRectF                         _canvasWindow;
     QRectF                         _changeArea;
     QPointF                        _offset;
     QPoint                          _dragPoint;
     std::unique_ptr<GraphicPoint> _cursorPoint;
+    std::unique_ptr<GraphicImage>_image;
     GraphicContainer         _container;
     double                          _canvasWidth;
     double                          _canvasHeight;
     int                                _floor;
+    int                                _backgroundFloor;
+    int                                _mod;
     uint8_t                         _gridSize;
     uint8_t                         _scale;
     bool                              _lineBegins;
     bool                             _isDragging;
+    bool                             _isBackgroundDragging;
+    bool                              _backgroundVisible;
+    bool                              _backgroundFloorVisible;
     bool                              _ctrlPressed;
 
     void reset();
@@ -79,6 +89,9 @@ private:
     void dragBegins(const QPoint& pos);
     void dragMove(const QPoint& pos);
     void dragEnds(const QPoint& pos);
+    void dragBackgroundBegins(const QPoint& pos);
+    void dragBackgroundMove(const QPoint& pos);
+    void dragBackgroundEnds(const QPoint& pos);
     bool cursorShadow(const QPointF& pos);
     bool lineAttachment(const QPointF& pos);
     void drawGrid(QPainter* painter);
@@ -90,6 +103,7 @@ private:
     void mouseMoveEvent(QMouseEvent *event) override;
     void wheelEvent(QWheelEvent *event) override;
     void hoverMoveEvent(QHoverEvent *event) override;
+    void hoverLeaveEvent(QHoverEvent *event) override;
     void keyPressEvent(QKeyEvent *event) override;
     void keyReleaseEvent(QKeyEvent *event) override;
     void focusInEvent(QFocusEvent * event) override;
