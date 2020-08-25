@@ -39,7 +39,7 @@
         <file>qml/resources/eye_closed.png</file>
         <file>qml/resources/eye_opened.png</file>
         <file>qml/resources/open_image.png</file>
-        <file>qml/Pages/ToolBar.qml</file>
+        <file>qml/Pages/ViewToolBar.qml</file>
         <file>qml/resources/pinned.png</file>
         <file>qml/resources/unpinned.png</file>
         <file>qml/resources/magnet.png</file>
