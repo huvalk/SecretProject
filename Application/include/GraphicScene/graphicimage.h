@@ -22,5 +22,7 @@ public:
 
 private:
     QImage    _image;
+    QRectF     _source;
+    QRectF    _target;
     QPointF  _topLeft;
 };

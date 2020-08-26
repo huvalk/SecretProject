@@ -42,6 +42,7 @@ void GraphicScene::registerMe(const std::string& moduleName)
 
 void GraphicScene::paint(QPainter* painter)
 {
+    // TODO баг при загрузке до смены масштаба неправильное значение _canvasWindow
     if (_scale > 1 && (_mod == EditingMod::CreateWalls || _mod == EditingMod::MagniteToWalls))
     {
         drawGrid(painter);
@@ -332,10 +333,11 @@ void GraphicScene::drawGrid(QPainter *painter)
 void GraphicScene::geometryChanged(const QRectF &newGeometry, const QRectF &oldGeometry)
 {
     (void)oldGeometry;
-    _canvasWindow = newGeometry;
-    _canvasWidth = _canvasWindow.width();
-    _canvasHeight = _canvasWindow.height();
-    _changeArea = _canvasWindow;
+    _changeArea = newGeometry;
+    _canvasWidth = newGeometry.width();
+    _canvasHeight = newGeometry.height();
+    _canvasWindow.setWidth(_canvasWidth / _scale);
+    _canvasWindow.setHeight(_canvasHeight / _scale);
     update();
 }
 

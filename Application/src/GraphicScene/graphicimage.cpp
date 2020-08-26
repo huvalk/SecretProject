@@ -8,6 +8,8 @@ GraphicImage::GraphicImage(const double x, const double y, const QString path)
       _topLeft(x, y)
 {
     _boundingRect.setSize(_image.size());
+    _source = _boundingRect;
+    _target = _boundingRect;
 }
 
 GraphicImage::GraphicImage(const QPointF &pos, const QString path)
@@ -16,6 +18,8 @@ GraphicImage::GraphicImage(const QPointF &pos, const QString path)
       _topLeft(pos)
 {
     _boundingRect.setSize(_image.size());
+    _source = _boundingRect;
+    _target = _boundingRect;
 }
 
 QPointF GraphicImage::pos()
@@ -25,8 +29,16 @@ QPointF GraphicImage::pos()
 
 bool GraphicImage::redrawRequest(const QRectF &changeArea)
 {
-    // TODO добавить расчет sorce и target для метода painter->drawImage
-    return _boundingRect.intersects(changeArea);
+    auto tempRect = _boundingRect.intersected(changeArea);
+    if (tempRect.isNull())
+    {
+        return false;
+    }
+    _target = tempRect;
+    _source = tempRect;
+    _target.moveTo(_target.topLeft() - _topLeft);
+
+    return true;
 }
 
 bool GraphicImage::wasClicked(const QPointF &pos, const uint8_t scale)
@@ -50,8 +62,8 @@ GraphicTypes::GraphicItems GraphicImage::type()
 void GraphicImage::paint(QPainter *painter, const QPointF &offset, const uint8_t scale, const bool extColor)
 {
     (void)extColor;
-    //TODO Предварительно прощитывать настоящее положение
-    painter->drawImage(QRectF(_topLeft.x() * scale - offset.x(), _topLeft.y() * scale -offset.y(), _image.width() * scale, _image.height() * scale), _image);
+    painter->drawImage(QRectF(_target.topLeft().x() * scale - offset.x(), _target.topLeft().y() * scale -offset.y(), _target.width() * scale, _target.height() * scale),
+                       _image, _source);
 }
 
 void GraphicImage::moveTo(const QPointF &offset)
