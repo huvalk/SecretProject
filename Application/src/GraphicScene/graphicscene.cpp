@@ -17,7 +17,8 @@ GraphicScene::GraphicScene(QQuickItem *parent):
     _canvasHeight(),
     _floor(1),
     _backgroundFloor(1),
-    _mod(EditingMod::CreateWalls),
+    _editingMod(EditingMod::CreateWalls),
+    _cursorMod(CursorMod::MagniteToGrid),
     _gridSize(16),
     _scale(2),
     _lineBegins(false),
@@ -43,20 +44,18 @@ void GraphicScene::registerMe(const std::string& moduleName)
 void GraphicScene::paint(QPainter* painter)
 {
     // TODO баг при загрузке до смены масштаба неправильное значение _canvasWindow
-    if (_scale > 1 && (_mod == EditingMod::CreateWalls || _mod == EditingMod::MagniteToWalls))
+    if (_scale > 1 && (_editingMod != EditingMod::Nothing))
     {
         drawGrid(painter);
     }
 
-    if (_backgroundVisible && _image->redrawRequest(_canvasWindow) &&
-            (_mod == EditingMod::CreateWalls || _mod == EditingMod::MagniteToWalls))
+    if (_backgroundVisible && _image->redrawRequest(_canvasWindow))
     {
         _image->paint(painter, _offset, _scale);
     }
 
     painter->setRenderHint(QPainter::Antialiasing, true);
-    if (_backgroundFloorVisible && _backgroundFloor != _floor &&
-            (_mod == EditingMod::CreateWalls || _mod == EditingMod::MagniteToWalls))
+    if (_backgroundFloorVisible && _backgroundFloor != _floor && (_editingMod != EditingMod::Nothing))
     {
         painter->setPen(QPen(QBrush("black"), 8, Qt::SolidLine, Qt::RoundCap));
         _container.paintLines(_backgroundFloor, _scale, _offset, _canvasWindow, painter, true);
@@ -65,7 +64,7 @@ void GraphicScene::paint(QPainter* painter)
     //TODO избавиться от changeArea пока
     _container.paintLines(_floor, _scale, _offset, _canvasWindow, painter);
 
-    if (!_isDragging && (_mod == EditingMod::CreateWalls || _mod == EditingMod::MagniteToWalls))
+    if (!_isDragging)
     {
         painter->setRenderHint(QPainter::Antialiasing, false);
         _container.paintPoints(_floor, _scale, _offset, _canvasWindow, painter);
@@ -119,12 +118,14 @@ void GraphicScene::setBackground(const QString path)
     update();
 }
 
-void GraphicScene::setMod(const int mod)
+void GraphicScene::setEditingMod(const int mod)
 {
-    if (mod >= 0 || mod <= EditingMod::Description)
-    {
-        _mod = mod;
-    }
+    _editingMod = mod;
+}
+
+void GraphicScene::setCursorMod(const int mod)
+{
+    _cursorMod = mod;
 }
 
 void GraphicScene::setBackgroundVisible(const bool is)
@@ -234,6 +235,7 @@ void GraphicScene::dragBackgroundMove(const QPoint &pos)
 {
     QPointF div = _dragPoint - pos;
     _offset += div;
+    _canvasWindow.moveTo(_offset / _scale);
     _image->moveTo(_image->pos() + (div / _scale));
     _dragPoint = pos;
 }
@@ -344,10 +346,9 @@ void GraphicScene::geometryChanged(const QRectF &newGeometry, const QRectF &oldG
 void GraphicScene::mousePressEvent(QMouseEvent *event)
 {
     bool result = false;
-    switch (_mod)
+    switch (_editingMod)
     {
     case EditingMod::CreateWalls:
-    case EditingMod::MagniteToWalls:
         switch (event->button())
         {
         case Qt::LeftButton:
@@ -392,10 +393,9 @@ void GraphicScene::mousePressEvent(QMouseEvent *event)
 void GraphicScene::mouseReleaseEvent(QMouseEvent *event)
 {
     bool result = false;
-    switch (_mod)
+    switch (_editingMod)
     {
     case EditingMod::CreateWalls:
-    case EditingMod::MagniteToWalls:
         if (event->button() == Qt::LeftButton && _lineBegins)
         {
             std::tie(result, std::ignore)  = _container.addLine(_floor, _cursorPoint->pos());
@@ -441,7 +441,7 @@ void GraphicScene::mouseMoveEvent(QMouseEvent *event)
     {
         dragBackgroundMove(event->pos());
         result = true;
-    } else if (_mod == EditingMod::MagniteToWalls)
+    } else if (_cursorMod == CursorMod::MagniteToWalls)
     {
         result = lineAttachment(event->pos());
     } else
@@ -475,12 +475,12 @@ void GraphicScene::wheelEvent(QWheelEvent *event)
 void GraphicScene::hoverMoveEvent(QHoverEvent *event)
 {
     bool result = false;
-    switch (_mod)
+    switch (_cursorMod)
     {
-    case EditingMod::CreateWalls:
+    case CursorMod::MagniteToGrid:
             result = cursorShadow(event->posF());
             break;
-    case EditingMod::MagniteToWalls:
+    case CursorMod::MagniteToWalls:
         result = lineAttachment(event->posF());
         break;
     default:

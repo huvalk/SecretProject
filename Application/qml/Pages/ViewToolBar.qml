@@ -27,9 +27,9 @@ Column {
             falseIndicator: Resources.images.unmagnetImage
             onCheckedChanged: {
                 if (checked) {
-                    canvas.setMod(1)
+                    canvas.setCursorMod(2)
                 } else {
-                    canvas.setMod(0)
+                    canvas.setCursorMod(1)
                 }
             }
         }
@@ -59,9 +59,9 @@ Column {
             falseIndicator: Resources.images.unpinnedImage
             onCheckedChanged: {
                 if (checked) {
-                    canvas.setMod(2)
+                    canvas.setEditingMod(1)
                 } else {
-                    canvas.setMod(0)
+                    canvas.setEditingMod(0)
                 }
             }
         }

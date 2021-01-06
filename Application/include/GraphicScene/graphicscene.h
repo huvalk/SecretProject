@@ -41,7 +41,8 @@ public slots:
     void setOffset(const QPointF offset);
     void setFloor(const int floor);
     void setBackground(const QString path);
-    void setMod(const int mod);
+    void setEditingMod(const int mod);
+    void setCursorMod(const int mod);
     void setBackgroundVisible(const bool is);
     void setBackgroundFloor(const int floor);
     void setBackgroundFloorVisible(const bool is);
@@ -55,10 +56,15 @@ signals:
 private:
     enum EditingMod {
         CreateWalls = 0,
-        MagniteToWalls,
         MoveBackground,
-        Description,
+        CreateCamera,
+        CreateMark,
         Nothing
+    };
+    enum CursorMod {
+        NoCursor = 0,
+        MagniteToGrid,
+        MagniteToWalls
     };
     QRectF                         _canvasWindow;
     QRectF                         _changeArea;
@@ -71,7 +77,8 @@ private:
     double                          _canvasHeight;
     int                                _floor;
     int                                _backgroundFloor;
-    int                                _mod;
+    int                                _editingMod;
+    int                                _cursorMod;
     uint8_t                         _gridSize;
     uint8_t                         _scale;
     bool                              _lineBegins;

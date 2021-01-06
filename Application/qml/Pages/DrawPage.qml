@@ -9,10 +9,11 @@ import GraphicScene 1.0
 
 DefaultPage {
     property int mapID
-    function uploadMap(mod) {
+    function uploadMap(editingMod, cursorMod) {
         // TODO переместитьбазу данных в c++
         if ( _canvas.parseJSONScene( database.getMap(mapID) ) ) {
-            _canvas.setMod(mod)
+            _canvas.setEditingMod(editingMod)
+            _canvas.setCursorMod(cursorMod)
         }
     }
 

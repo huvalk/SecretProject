@@ -35,7 +35,7 @@ bool GraphicImage::redrawRequest(const QRectF &changeArea)
         return false;
     }
     _target = tempRect;
-    _source = tempRect;
+//    _source = tempRect;
     _target.moveTo(_target.topLeft() - _topLeft);
 
     return true;
@@ -62,14 +62,16 @@ GraphicTypes::GraphicItems GraphicImage::type()
 void GraphicImage::paint(QPainter *painter, const QPointF &offset, const uint8_t scale, const bool extColor)
 {
     (void)extColor;
-    painter->drawImage(QRectF(_target.topLeft().x() * scale - offset.x(), _target.topLeft().y() * scale -offset.y(), _target.width() * scale, _target.height() * scale),
+    painter->drawRect(QRectF(_boundingRect.topLeft().x() * scale - offset.x(), _boundingRect.topLeft().y() * scale - offset.y(), _boundingRect.width() * scale, _boundingRect.height() * scale));
+    qDebug() << offset;
+    painter->drawImage(QRectF(_boundingRect.topLeft().x() * scale - offset.x(), _boundingRect.topLeft().y() * scale - offset.y(), _boundingRect.width() * scale, _boundingRect.height() * scale),
                        _image, _source);
 }
 
 void GraphicImage::moveTo(const QPointF &offset)
 {
     _topLeft = offset;
-    _boundingRect.setTopLeft(_topLeft);
+    _boundingRect.moveTo(_topLeft);
 }
 
 void GraphicImage::moveTo(const double x, const double y)

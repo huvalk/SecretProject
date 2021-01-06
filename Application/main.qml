@@ -79,21 +79,21 @@ Window {
 
         onCreateNewClicked: {
             _drawPage.mapID = _openPage.openedMapID
-            _drawPage.uploadMap()
+            _drawPage.uploadMap(0, 1)
             _stackView.push(_drawPage)
             _mainWindow.visibility = Window.Maximized
         }
 
         onOpenFileClicked: {
             _drawPage.mapID = _openPage.openedMapID
-            _drawPage.uploadMap(4)
+            _drawPage.uploadMap(4, 0)
             _stackView.push(_drawPage)
             _mainWindow.visibility = Window.Maximized
         }
 
         onEditFileClicked: {
             _drawPage.mapID = _openPage.openedMapID
-            _drawPage.uploadMap(0)
+            _drawPage.uploadMap(0, 1)
             _stackView.push(_drawPage)
             _mainWindow.visibility = Window.Maximized
         }
