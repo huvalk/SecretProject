@@ -62,8 +62,6 @@ GraphicTypes::GraphicItems GraphicImage::type()
 void GraphicImage::paint(QPainter *painter, const QPointF &offset, const uint8_t scale, const bool extColor)
 {
     (void)extColor;
-    painter->drawRect(QRectF(_boundingRect.topLeft().x() * scale - offset.x(), _boundingRect.topLeft().y() * scale - offset.y(), _boundingRect.width() * scale, _boundingRect.height() * scale));
-    qDebug() << offset;
     painter->drawImage(QRectF(_boundingRect.topLeft().x() * scale - offset.x(), _boundingRect.topLeft().y() * scale - offset.y(), _boundingRect.width() * scale, _boundingRect.height() * scale),
                        _image, _source);
 }

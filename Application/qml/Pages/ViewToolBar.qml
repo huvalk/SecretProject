@@ -124,6 +124,49 @@ Column {
         }
     }
 
+    BaseText {
+        id: _createCameraText
+        width: parent.width
+        horizontalAlignment: Text.AlignHCenter
+        verticalAlignment: Text.AlignVCenter
+        text: "Камеры"
+    }
+
+    Row {
+        EyeCheckBox {
+            id: _createCameraBtn
+
+            trueIndicator: Resources.images.eyeOpened
+            falseIndicator: Resources.images.eyeClosed
+            onCheckedChanged: {
+                if (checked) {
+                    canvas.setEditingMod(2)
+                } else {
+                    canvas.setEditingMod(0)
+                }
+            }
+        }
+
+        DefaultInput {
+            id: _cameraIdInput
+            anchors.verticalCenter: parent.verticalCenter
+            width: 40
+            height: 26
+
+            inputMethodHints: Qt.ImhFormattedNumbersOnly
+            color: _style.inputColor
+            selectionColor: _style.btnSecondaryColor
+            placeholderText: "id"
+
+            onTextChanged: {
+//                let floor = parseInt(text)
+//                if (!isNaN(floor)) {
+//                    canvas.setBackgroundFloor(floor)
+//                }
+            }
+        }
+    }
+
     DefaultButton {
         // под размер картинки 96*47
         id: _upFloor

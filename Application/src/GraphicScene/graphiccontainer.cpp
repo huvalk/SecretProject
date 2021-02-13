@@ -39,7 +39,6 @@ void GraphicContainer::paintPoints(const int floor, const uint8_t scale, const Q
 
 std::pair<bool, QPointF> GraphicContainer::lineAttachment(const int floor, const double startX, const double startY, const QPointF &pos)
 {
-    // TODO не срабатывает при наклоне в право
     auto currentFloor = _lines.find(floor);
     if (currentFloor == _lines.end())
     {

@@ -19,7 +19,7 @@ GraphicScene::GraphicScene(QQuickItem *parent):
     _backgroundFloor(1),
     _editingMod(EditingMod::CreateWalls),
     _cursorMod(CursorMod::MagniteToGrid),
-    _gridSize(16),
+    _gridSize(8),
     _scale(2),
     _lineBegins(false),
     _isDragging(false),

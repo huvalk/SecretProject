@@ -24,7 +24,7 @@ DefaultPage {
         anchors.top: parent.top
         anchors.left: parent.left
         anchors.bottom: parent.bottom
-        width: parent.width - _saveMapBtn.width
+        width: parent.width - _saveMapBtn.width * 3
         color: "white"
         focus: true
 
@@ -45,7 +45,6 @@ DefaultPage {
         anchors.right: parent.right
         anchors.left: _backGround.right
         anchors.bottom: parent.bottom
-        width: btnWidth
         spacing: _style.defaultSpace
         canvas: _canvas
     }
