@@ -37,6 +37,17 @@ void GraphicContainer::paintPoints(const int floor, const uint8_t scale, const Q
     }
 }
 
+void GraphicContainer::paintTemp(const uint8_t scale, const QPointF& offset, const  QRectF& area, QPainter* painter)
+{
+    for (auto item: _temp)
+    {
+        if (item->redrawRequest(area))
+        {
+            item->paint(painter, offset, scale, false);
+        }
+    }
+}
+
 std::pair<bool, QPointF> GraphicContainer::lineAttachment(const int floor, const double startX, const double startY, const QPointF &pos)
 {
     auto currentFloor = _lines.find(floor);
@@ -148,6 +159,59 @@ std::pair<bool, QRectF> GraphicContainer::addLine(const int floor, const QPointF
     return result;
 }
 
+std::pair<bool, QRectF> GraphicContainer::addTempPoint(const QPointF &pos)
+{
+     _tempPoint = std::make_shared<GraphicPoint>(pos, _pointSize, 2);
+     _tempPos = std::make_shared<QPointF>(_tempPoint->pos());
+    _temp.insert(_tempPoint);
+
+    return std::make_pair(true, _tempPoint->boundingRect());
+}
+
+// Дополнительная переменная для завершения создания
+std::tuple<bool, bool, QRectF>  GraphicContainer::addTempLine(const QPointF &pos)
+{
+    if (_tempPoint->wasClicked(pos))
+    {
+        _tempPoint = nullptr;
+        _tempPos = nullptr;
+        auto created = _temp.size() > 1;
+        _temp.clear();
+        // Создать полигон из точек
+        return std::make_tuple(true, created, QRectF());
+    }
+
+    auto newTempLine = std::make_shared<GraphicLine>(*_tempPos, pos);
+    _temp.emplace(newTempLine);
+    auto result = std::make_tuple(true, false, newTempLine->boundingRect());
+    *_tempPos = pos;
+
+    return result;
+}
+
+bool GraphicContainer::clearPoints(const int floor)
+{
+    auto currentFloor = _points.find(floor);
+    if (currentFloor == _points.end())
+    {
+        return false;
+    }
+
+    currentFloor->second.clear();
+    return true;
+}
+
+bool GraphicContainer::clearTemp()
+{
+    if (_temp.size() == 0)
+    {
+        return false;
+    }
+
+    _temp.clear();
+    return true;
+}
+
 std::pair<bool, QRectF> GraphicContainer::deleteItem(const int floor, const QPointF &pos)
 {
     auto point = findPoint(floor, pos);
@@ -173,32 +237,32 @@ std::pair<bool, QRectF> GraphicContainer::deleteItem(const int floor, const QPoi
     return std::make_pair(false, QRectF());
 }
 
-GraphicTypes::floor<GraphicPoint>::iterator GraphicContainer::findPoints(const int floor)
+GraphicTypes::building<GraphicPoint>::iterator GraphicContainer::findPoints(const int floor)
 {
     return _points.find(floor);
 }
 
-GraphicTypes::floor<GraphicPoint>::iterator GraphicContainer::beginPoints()
+GraphicTypes::building<GraphicPoint>::iterator GraphicContainer::beginPoints()
 {
     return _points.begin();
 }
 
-GraphicTypes::floor<GraphicPoint>::iterator GraphicContainer::endPoints()
+GraphicTypes::building<GraphicPoint>::iterator GraphicContainer::endPoints()
 {
     return _points.end();
 }
 
-GraphicTypes::floor<GraphicLine>::iterator GraphicContainer::findLines(const int floor)
+GraphicTypes::building<GraphicLine>::iterator GraphicContainer::findLines(const int floor)
 {
     return _lines.find(floor);
 }
 
-GraphicTypes::floor<GraphicLine>::iterator GraphicContainer::beginLines()
+GraphicTypes::building<GraphicLine>::iterator GraphicContainer::beginLines()
 {
     return _lines.begin();
 }
 
-GraphicTypes::floor<GraphicLine>::iterator GraphicContainer::endLines()
+GraphicTypes::building<GraphicLine>::iterator GraphicContainer::endLines()
 {
     return _lines.end();
 }

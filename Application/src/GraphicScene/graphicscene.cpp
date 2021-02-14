@@ -22,6 +22,7 @@ GraphicScene::GraphicScene(QQuickItem *parent):
     _gridSize(8),
     _scale(2),
     _lineBegins(false),
+    _polyBegins(false),
     _isDragging(false),
     _isBackgroundDragging(false),
     _backgroundVisible(false),
@@ -63,6 +64,8 @@ void GraphicScene::paint(QPainter* painter)
 
     //TODO избавиться от changeArea пока
     _container.paintLines(_floor, _scale, _offset, _canvasWindow, painter);
+    painter->setPen(QPen(QBrush("yellow"), 8, Qt::SolidLine, Qt::RoundCap));
+    _container.paintTemp(_scale, _offset, _canvasWindow, painter);
 
     if (!_isDragging)
     {
@@ -121,6 +124,8 @@ void GraphicScene::setBackground(const QString path)
 void GraphicScene::setEditingMod(const int mod)
 {
     _editingMod = mod;
+    _container.clearPoints(_floor);
+    qDebug() << _editingMod;
 }
 
 void GraphicScene::setCursorMod(const int mod)
@@ -363,6 +368,30 @@ void GraphicScene::mousePressEvent(QMouseEvent *event)
         }
         break;
 
+    case EditingMod::CreateCamera:
+        switch (event->button())
+        {
+        case Qt::LeftButton:
+            if (_polyBegins == false)
+            {
+                std::tie(result, std::ignore) = _container.addTempPoint(_cursorPoint->pos());
+                _polyBegins = true;
+            }
+            break;
+        case Qt::RightButton:
+            if (_polyBegins == true)
+            {
+                _polyBegins = false;
+                _container.clearTemp();
+            } else {
+                std::tie(result, std::ignore)  = _container.deleteItem(_floor, _cursorPoint->pos());
+            }
+            break;
+        default:
+            break;
+        }
+        break;
+
     case EditingMod::MoveBackground:
         switch (event->button())
         {
@@ -400,6 +429,16 @@ void GraphicScene::mouseReleaseEvent(QMouseEvent *event)
         {
             std::tie(result, std::ignore)  = _container.addLine(_floor, _cursorPoint->pos());
             _lineBegins = !result;
+        }
+        break;
+
+    case EditingMod::CreateCamera:
+        if (event->button() == Qt::LeftButton && _polyBegins)
+        {
+            auto created = false;
+            // TODO обернуть создание компонентов в отдельный класс
+            std::tie(result, created, std::ignore)  = _container.addTempLine(_cursorPoint->pos());
+            _polyBegins = !created;
         }
         break;
 

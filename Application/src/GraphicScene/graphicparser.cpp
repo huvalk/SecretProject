@@ -5,7 +5,7 @@ GraphicParser::GraphicParser()
 
 }
 
-QString GraphicParser::generateJSONScene(const GraphicTypes::floor<GraphicLine> &scene)
+QString GraphicParser::generateJSONScene(const GraphicTypes::building<GraphicLine> &scene)
 {
     QString _jsonScene = "{";
         for(auto i = scene.begin(); i != scene.end(); ++i)
@@ -95,14 +95,14 @@ std::tuple<bool, QStringRef, double> GraphicParser::parseDouble(QStringRef &json
      return std::make_tuple(true, json, num);
 }
 
-std::pair<bool, GraphicTypes::floor<GraphicLine>> GraphicParser::parseJSONScene(QString json)
+std::pair<bool, GraphicTypes::building<GraphicLine>> GraphicParser::parseJSONScene(QString json)
 {
     QStringRef subStr(&json);
     int state = 0;
     int currentFloor = 0;
     bool noErr = true;
     std::set<std::shared_ptr<GraphicLine>> resLines;
-    GraphicTypes::floor<GraphicLine> points;
+    GraphicTypes::building<GraphicLine> points;
 
     subStr = eraseSpaces(subStr);
     while (subStr.size() != 0 && state != 6 && noErr)

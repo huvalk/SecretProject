@@ -82,6 +82,7 @@ private:
     uint8_t                         _gridSize;
     uint8_t                         _scale;
     bool                              _lineBegins;
+    bool                              _polyBegins;
     bool                             _isDragging;
     bool                             _isBackgroundDragging;
     bool                              _backgroundVisible;
