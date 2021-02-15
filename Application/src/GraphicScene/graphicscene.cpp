@@ -64,6 +64,8 @@ void GraphicScene::paint(QPainter* painter)
 
     //TODO избавиться от changeArea пока
     _container.paintLines(_floor, _scale, _offset, _canvasWindow, painter);
+    painter->setPen(QPen(QBrush("blue"), 8, Qt::SolidLine, Qt::RoundCap));
+    _container.paintPolygons(_floor, _scale, _offset, _canvasWindow, painter);
     painter->setPen(QPen(QBrush("yellow"), 8, Qt::SolidLine, Qt::RoundCap));
     _container.paintTemp(_scale, _offset, _canvasWindow, painter);
 
@@ -374,6 +376,7 @@ void GraphicScene::mousePressEvent(QMouseEvent *event)
         case Qt::LeftButton:
             if (_polyBegins == false)
             {
+                qDebug() << "start creating";
                 std::tie(result, std::ignore) = _container.addTempPoint(_cursorPoint->pos());
                 _polyBegins = true;
             }
@@ -435,10 +438,18 @@ void GraphicScene::mouseReleaseEvent(QMouseEvent *event)
     case EditingMod::CreateCamera:
         if (event->button() == Qt::LeftButton && _polyBegins)
         {
-            auto created = false;
+            QPolygonF newPoly;
             // TODO обернуть создание компонентов в отдельный класс
-            std::tie(result, created, std::ignore)  = _container.addTempLine(_cursorPoint->pos());
-            _polyBegins = !created;
+            std::tie(result, newPoly, std::ignore)  = _container.addTempLine(_cursorPoint->pos());
+
+            if (newPoly.size() > 0)
+            {
+                _polyBegins = false;
+                if (newPoly.size() > 1)
+                {
+                    _container.addPolygon(_floor, newPoly);
+                }
+            }
         }
         break;
 

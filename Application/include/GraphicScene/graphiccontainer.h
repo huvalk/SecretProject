@@ -4,6 +4,7 @@
 #include <GraphicScene/graphicline.h>
 #include <GraphicScene/graphictypes.h>
 #include <GraphicScene/graphicparser.h>
+#include <GraphicScene/graphicpolygon.h>
 #include <map>
 #include <memory>
 #include <set>
@@ -15,6 +16,7 @@ public:
     GraphicContainer();
     void paintLines(const int floor, const uint8_t scale, const QPointF& offset, const  QRectF& area, QPainter* painter, const bool bg = false);
     void paintPoints(const int floor, const uint8_t scale, const QPointF& offset, const  QRectF& area, QPainter* painter);
+    void paintPolygons(const int floor, const uint8_t scale, const QPointF& offset, const  QRectF& area, QPainter* painter);
     void paintTemp(const uint8_t scale, const QPointF& offset, const  QRectF& area, QPainter* painter);
 
     std::pair<bool, QPointF>  lineAttachment(const int floor, const double startX, const double startY, const QPointF &pos);
@@ -22,8 +24,9 @@ public:
     std::shared_ptr<GraphicLine> findLine(const int floor, const QPointF& pos);
     std::pair<bool, QRectF> addPoint(const int floor, const QPointF &pos);
     std::pair<bool, QRectF>  addLine(const int floor, const QPointF &pos);
+    std::pair<bool, QRectF> addPolygon(const int floor, const QPolygonF &poly);
     std::pair<bool, QRectF> addTempPoint(const QPointF &pos);
-    std::tuple<bool, bool, QRectF>  addTempLine(const QPointF &pos);
+    std::tuple<bool, QPolygonF, QRectF> addTempLine(const QPointF &pos);
     std::pair<bool, QRectF>  deleteItem(const int floor, const QPointF &pos);
     bool clearPoints(const int floor);
     bool clearTemp();
@@ -40,9 +43,11 @@ private:
     GraphicParser                                      _parser;
     GraphicTypes::building<GraphicPoint>  _points;
     GraphicTypes::building<GraphicLine>   _lines;
+    GraphicTypes::building<GraphicPolygon>   _polygons;
     GraphicTypes::floor<GraphicItem>   _temp;
     QString                                                _jsonScene;
     std::shared_ptr<GraphicPoint>           _tempPoint;
+    QPolygonF                                          _tempPoly;
     std::shared_ptr<QPointF>                   _tempPos;
     uint8_t                                                 _pointSize;
 };

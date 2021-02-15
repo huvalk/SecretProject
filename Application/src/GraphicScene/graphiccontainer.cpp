@@ -1,5 +1,6 @@
 #include <cmath>
 #include "GraphicScene/graphiccontainer.h"
+#include <QDebug>
 
 GraphicContainer::GraphicContainer()
     : _pointSize(5)
@@ -28,6 +29,21 @@ void GraphicContainer::paintPoints(const int floor, const uint8_t scale, const Q
     if (currentFloorPoints != _points.end())
     {
         for (auto item: currentFloorPoints->second)
+        {
+            if (item->redrawRequest(area))
+            {
+                item->paint(painter, offset, scale);
+            }
+        }
+    }
+}
+
+void GraphicContainer::paintPolygons(const int floor, const uint8_t scale, const QPointF& offset, const  QRectF& area, QPainter* painter)
+{
+    auto currentFloorPolys = _polygons.find(floor);
+    if (currentFloorPolys != _polygons.end())
+    {
+        for (auto item: currentFloorPolys->second)
         {
             if (item->redrawRequest(area))
             {
@@ -159,34 +175,52 @@ std::pair<bool, QRectF> GraphicContainer::addLine(const int floor, const QPointF
     return result;
 }
 
+std::pair<bool, QRectF> GraphicContainer::addPolygon(const int floor, const QPolygonF &poly)
+{
+    _polygons[floor].insert(std::make_shared<GraphicPolygon>(poly));
+
+    return std::make_pair(true, poly.boundingRect());
+}
+
+// Начинается создание полигона
 std::pair<bool, QRectF> GraphicContainer::addTempPoint(const QPointF &pos)
 {
-     _tempPoint = std::make_shared<GraphicPoint>(pos, _pointSize, 2);
-     _tempPos = std::make_shared<QPointF>(_tempPoint->pos());
+    qDebug() << "tempPos created";
+    _tempPoint = std::make_shared<GraphicPoint>(pos, _pointSize, 2);
+    _tempPos = std::make_shared<QPointF>(_tempPoint->pos());
     _temp.insert(_tempPoint);
+    _tempPoly.clear();
 
     return std::make_pair(true, _tempPoint->boundingRect());
 }
 
 // Дополнительная переменная для завершения создания
-std::tuple<bool, bool, QRectF>  GraphicContainer::addTempLine(const QPointF &pos)
+// Здесьже формируется полигон
+std::tuple<bool, QPolygonF, QRectF>  GraphicContainer::addTempLine(const QPointF &pos)
 {
-    if (_tempPoint->wasClicked(pos))
+    if (_tempPos == nullptr)
     {
-        _tempPoint = nullptr;
-        _tempPos = nullptr;
-        auto created = _temp.size() > 1;
-        _temp.clear();
-        // Создать полигон из точек
-        return std::make_tuple(true, created, QRectF());
+        qWarning() << "tempPos is null";
+        return std::make_tuple(false, QPolygonF(), QRectF());
     }
-
     auto newTempLine = std::make_shared<GraphicLine>(*_tempPos, pos);
     _temp.emplace(newTempLine);
-    auto result = std::make_tuple(true, false, newTempLine->boundingRect());
-    *_tempPos = pos;
+    _tempPos = std::make_shared<QPointF>(pos);
+    _tempPoly.append(pos);
 
-    return result;
+    if (_tempPoint->wasClicked(pos))
+    {
+        auto result = std::make_tuple(true, _tempPoly, _tempPoly.boundingRect());
+
+        _tempPoint = nullptr;
+        _tempPos = nullptr;
+        _tempPoly.clear();
+        _temp.clear();
+
+        return result;
+    }
+
+    return std::make_tuple(true, QPolygonF(), newTempLine->boundingRect());
 }
 
 bool GraphicContainer::clearPoints(const int floor)

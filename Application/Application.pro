@@ -21,6 +21,7 @@ SOURCES += \
         src/GraphicScene/graphicline.cpp \
         src/GraphicScene/graphicparser.cpp \
         src/GraphicScene/graphicpoint.cpp \
+        src/GraphicScene/graphicpolygon.cpp \
         src/GraphicScene/graphicscene.cpp \
         src/MapFileModel/mapfile.cpp \
         src/MapFileModel/mapfilemodel.cpp \
@@ -52,6 +53,7 @@ HEADERS += \
     include/GraphicScene/graphicline.h \
     include/GraphicScene/graphicparser.h \
     include/GraphicScene/graphicpoint.h \
+    include/GraphicScene/graphicpolygon.h \
     include/GraphicScene/graphicscene.h \
     include/GraphicScene/graphictypes.h \
     include/MapFileModel/mapfile.h \
