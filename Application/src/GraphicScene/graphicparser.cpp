@@ -1,4 +1,6 @@
 #include "GraphicScene/graphicparser.h"
+#include "QJsonDocument"
+#include "QJsonObject"
 
 GraphicParser::GraphicParser()
 {
@@ -102,10 +104,12 @@ std::pair<bool, GraphicTypes::building<GraphicLine>> GraphicParser::parseJSONSce
     int currentFloor = 0;
     bool noErr = true;
     std::set<std::shared_ptr<GraphicLine>> resLines;
-    GraphicTypes::building<GraphicLine> points;
+    std::set<std::shared_ptr<GraphicPolygon>> resPolys;
+    GraphicTypes::building<GraphicLine> lines;
+    GraphicTypes::building<GraphicPolygon> polygons;
 
     subStr = eraseSpaces(subStr);
-    while (subStr.size() != 0 && state != 6 && noErr)
+    while (subStr.size() != 0 && state != 9 && noErr)
     {
         switch (state) {
         case 0:
@@ -123,7 +127,7 @@ std::pair<bool, GraphicTypes::building<GraphicLine>> GraphicParser::parseJSONSce
             if (subStr[0] == '}')
             {
                 subStr = eraseSymbol(1, subStr);
-                state = 6;
+                state = 9;
             } else if (std::tie(noErr, subStr, currentFloor) = parseNumber(subStr); noErr)
             {
                 state = 2;
@@ -160,10 +164,10 @@ std::pair<bool, GraphicTypes::building<GraphicLine>> GraphicParser::parseJSONSce
             if (subStr[0] == '}')
             {
                 subStr = eraseSymbol(1, subStr);
-                state = 6;
+                state = 9;
             } else if (std::tie(noErr, subStr, resLines)  =  parseLines(subStr); noErr)
             {
-                points[currentFloor] = std::move(resLines);
+                lines[currentFloor] = std::move(resLines);
                 state = 5;
             } else
             {
@@ -172,6 +176,43 @@ std::pair<bool, GraphicTypes::building<GraphicLine>> GraphicParser::parseJSONSce
             break;
 
         case 5:
+            if (subStr[0] == '}')
+            {
+                subStr = eraseSymbol(1, subStr);
+                state = 8;
+            } else if (subStr[0] == ',')
+            {
+                subStr = eraseSymbol(1, subStr);
+                state = 6;
+            } else
+            {
+                noErr = false;
+            }
+            break;
+
+        case 6:
+             if (std::tie(noErr, subStr, resPolys)  =  parsePolygons(subStr); noErr)
+            {
+                polygons[currentFloor] = std::move(resPolys);
+                state = 7;
+            } else
+            {
+                noErr = false;
+            }
+            break;
+
+        case 7:
+            if (subStr[0] == '}')
+            {
+                subStr = eraseSymbol(1, subStr);
+                state = 8;
+            } else
+            {
+                noErr = false;
+            }
+            break;
+
+        case 8:
             if (subStr[0] == ',')
             {
                 subStr = eraseSymbol(1, subStr);
@@ -179,7 +220,7 @@ std::pair<bool, GraphicTypes::building<GraphicLine>> GraphicParser::parseJSONSce
             } else if (subStr[0] == '}')
             {
                 subStr = eraseSymbol(1, subStr);
-                state = 6;
+                state = 9;
             } else
             {
                 noErr = false;
@@ -190,7 +231,7 @@ std::pair<bool, GraphicTypes::building<GraphicLine>> GraphicParser::parseJSONSce
         subStr = eraseSpaces(subStr);
     }
 
-    return std::make_pair((noErr && state == 6), std::move(points));
+    return std::make_pair((noErr && state == 9), std::move(lines));
 }
 
 std::tuple<bool, QStringRef, std::set<std::shared_ptr<GraphicLine>>> GraphicParser::parseLines(QStringRef &json)
@@ -200,7 +241,7 @@ std::tuple<bool, QStringRef, std::set<std::shared_ptr<GraphicLine>>> GraphicPars
     std::shared_ptr<GraphicLine> resLine;
     std::set<std::shared_ptr<GraphicLine>> result;
     json = eraseSpaces(json);
-    while (json.size() != 0 && state != 6 && noErr)
+    while (json.size() != 0 && state != 5 && noErr)
     {
         switch (state) {
         case 0:
@@ -262,23 +303,12 @@ std::tuple<bool, QStringRef, std::set<std::shared_ptr<GraphicLine>>> GraphicPars
                 noErr = false;
             }
             break;
-
-        case 5:
-            if (json[0] == '}')
-            {
-                json = eraseSymbol(1, json);
-                state = 6;
-            } else
-            {
-                noErr = false;
-            }
-            break;
         }
 
         json = eraseSpaces(json);
     }
 
-    return std::make_tuple((noErr && state == 6), json, std::move(result));
+    return std::make_tuple((noErr && state == 5), json, std::move(result));
 }
 
 std::tuple<bool, QStringRef, std::shared_ptr<GraphicLine>> GraphicParser::parseLine(QStringRef &json)
@@ -347,4 +377,153 @@ std::tuple<bool, QStringRef, std::shared_ptr<GraphicLine>> GraphicParser::parseL
     }
 
     return std::make_tuple((noErr && state == 4), json, std::make_shared<GraphicLine>(QPointF(resPos[0], resPos[1]), QPointF(resPos[2], resPos[3])));
+}
+
+std::tuple<bool, QStringRef, std::set<std::shared_ptr<GraphicPolygon>>> GraphicParser::parsePolygons(QStringRef &json)
+{
+    int state = 0;
+    bool noErr = true;
+    std::shared_ptr<GraphicPolygon> resPoly;
+    std::set<std::shared_ptr<GraphicPolygon>> result;
+    json = eraseSpaces(json);
+    while (json.size() != 0 && state != 5 && noErr)
+    {
+        switch (state) {
+        case 0:
+            if (json.left(5) != "polys")
+            {
+                noErr = false;
+            } else
+            {
+                json = eraseSymbol(5, json);
+                state = 1;
+            }
+            break;
+
+        case 1:
+            if (json[0] == ':')
+            {
+                json = eraseSymbol(1, json);
+                state = 2;
+            } else
+            {
+                noErr = false;
+            }
+            break;
+
+        case 2:
+            if (json[0] == '[')
+            {
+                json = eraseSymbol(1, json);
+                state = 3;
+            } else
+            {
+                noErr = false;
+            }
+            break;
+
+        case 3:
+            std::tie(noErr, json, resPoly) = parsePolygon(json);
+            if (noErr)
+            {
+                result.insert(std::move(resPoly));
+                state = 4;
+            } else
+            {
+                noErr = false;
+            }
+            break;
+
+        case 4:
+            if (json[0] == ']')
+            {
+                json = eraseSymbol(1, json);
+                state = 5;
+            } else if (json[0] == ',')
+            {
+                json = eraseSymbol(1, json);
+                state = 3;
+            } else
+            {
+                noErr = false;
+            }
+            break;
+        }
+
+        json = eraseSpaces(json);
+    }
+
+    return std::make_tuple((noErr && state == 5), json, std::move(result));
+}
+
+std::tuple<bool, QStringRef, std::shared_ptr<GraphicPolygon>> GraphicParser::parsePolygon(QStringRef &json)
+{
+    int state = 0;
+    int it = 0;
+    bool noErr = true;
+    double tempDouble = 0;
+    double tempX = 0;
+    QPolygonF resPoly;
+
+    json = eraseSpaces(json);
+    while (json.size() != 0 && state != 4 && noErr)
+    {
+        switch (state) {
+        case 0:
+            if (json[0] == '{')
+            {
+                json = eraseSymbol(1, json);
+                state = 1;
+            } else
+            {
+                noErr = false;
+            }
+            break;
+
+        case 1:
+            if (std::tie(noErr, json, tempDouble) = parseDouble(json); noErr)
+            {
+                if (it % 2 == 0)
+                {
+                    tempX = tempDouble;
+                } else
+                {
+                    resPoly << QPointF(tempX, tempDouble);
+                }
+
+                it++;
+                state = 2;
+            } else
+            {
+                noErr = false;
+            }
+            break;
+
+        case 2:
+            if (json[0] == ',')
+            {
+                json = eraseSymbol(1, json);
+                state = 1;
+            } else
+            {
+                state = 3;
+            }
+            break;
+
+        case 3:
+            if (json[0] == '}')
+            {
+                json = eraseSymbol(1, json);
+                state = 4;
+            } else
+            {
+                noErr = false;
+            }
+            break;
+        }
+
+        json = eraseSpaces(json);
+    }
+
+    return std::make_tuple((noErr && state == 4), json, std::make_shared<GraphicPolygon>(resPoly));
 }

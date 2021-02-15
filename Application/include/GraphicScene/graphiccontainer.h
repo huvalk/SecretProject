@@ -15,9 +15,9 @@ class GraphicContainer
 public:
     GraphicContainer();
     void paintLines(const int floor, const uint8_t scale, const QPointF& offset, const  QRectF& area, QPainter* painter, const bool bg = false);
-    void paintPoints(const int floor, const uint8_t scale, const QPointF& offset, const  QRectF& area, QPainter* painter);
-    void paintPolygons(const int floor, const uint8_t scale, const QPointF& offset, const  QRectF& area, QPainter* painter);
-    void paintTemp(const uint8_t scale, const QPointF& offset, const  QRectF& area, QPainter* painter);
+    void paintPoints(const int floor, const uint8_t scale, const QPointF& offset, const  QRectF& area, QPainter* painter, const bool extColor = false);
+    void paintPolygons(const int floor, const uint8_t scale, const QPointF& offset, const  QRectF& area, QPainter* painter, const bool extColor = false);
+    void paintTemp(const uint8_t scale, const QPointF& offset, const  QRectF& area, QPainter* painter, const bool extColor = false);
 
     std::pair<bool, QPointF>  lineAttachment(const int floor, const double startX, const double startY, const QPointF &pos);
     std::shared_ptr<GraphicPoint> findPoint(const int floor, const QPointF& pos);

@@ -23,7 +23,7 @@ void GraphicContainer::paintLines(const int floor, const uint8_t scale, const QP
     }
 }
 
-void GraphicContainer::paintPoints(const int floor, const uint8_t scale, const QPointF& offset, const  QRectF& area, QPainter* painter)
+void GraphicContainer::paintPoints(const int floor, const uint8_t scale, const QPointF& offset, const  QRectF& area, QPainter* painter, const bool extColor)
 {
     auto currentFloorPoints = _points.find(floor);
     if (currentFloorPoints != _points.end())
@@ -32,13 +32,13 @@ void GraphicContainer::paintPoints(const int floor, const uint8_t scale, const Q
         {
             if (item->redrawRequest(area))
             {
-                item->paint(painter, offset, scale);
+                item->paint(painter, offset, scale, extColor);
             }
         }
     }
 }
 
-void GraphicContainer::paintPolygons(const int floor, const uint8_t scale, const QPointF& offset, const  QRectF& area, QPainter* painter)
+void GraphicContainer::paintPolygons(const int floor, const uint8_t scale, const QPointF& offset, const  QRectF& area, QPainter* painter, const bool extColor)
 {
     auto currentFloorPolys = _polygons.find(floor);
     if (currentFloorPolys != _polygons.end())
@@ -47,19 +47,19 @@ void GraphicContainer::paintPolygons(const int floor, const uint8_t scale, const
         {
             if (item->redrawRequest(area))
             {
-                item->paint(painter, offset, scale);
+                item->paint(painter, offset, scale, extColor);
             }
         }
     }
 }
 
-void GraphicContainer::paintTemp(const uint8_t scale, const QPointF& offset, const  QRectF& area, QPainter* painter)
+void GraphicContainer::paintTemp(const uint8_t scale, const QPointF& offset, const  QRectF& area, QPainter* painter, const bool extColor)
 {
     for (auto item: _temp)
     {
         if (item->redrawRequest(area))
         {
-            item->paint(painter, offset, scale, false);
+            item->paint(painter, offset, scale, extColor);
         }
     }
 }

@@ -4,7 +4,7 @@
 
 GraphicPolygon::GraphicPolygon(const QPolygonF &poly)
     : GraphicItem(poly.boundingRect().topLeft(), poly.boundingRect().bottomRight(), true),
-      _fillStyle("#FF4040"),
+      _fillStyle("#1F75FE"),
       _poly(poly)
 {
 
@@ -43,7 +43,8 @@ void GraphicPolygon::paint(QPainter *painter, const QPointF &offset, const uint8
 {
     if (!extColor)
     {
-        painter->setPen(QPen(QBrush(_fillStyle), 5, Qt::SolidLine, Qt::RoundCap));
+        painter->setPen(QPen(QBrush(_fillStyle, Qt::SolidPattern), 5, Qt::SolidLine, Qt::RoundCap));
+        painter->setBrush(QBrush(_fillStyle, Qt::SolidPattern));
     }
 
     _points.clear();
@@ -51,8 +52,6 @@ void GraphicPolygon::paint(QPainter *painter, const QPointF &offset, const uint8
     {
         _points.emplace(_points.end(), point.x() * scale - offset.x(), point.y() * scale - offset.y());
     }
-    qDebug() << _points << " : " << _points.size();
-    qDebug() << _poly << " : " << _poly.size();
     painter->drawPolygon(_points.data(), static_cast<int>(_points.size()));
 }
 

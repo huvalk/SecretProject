@@ -63,11 +63,13 @@ void GraphicScene::paint(QPainter* painter)
     }
 
     //TODO избавиться от changeArea пока
-    _container.paintLines(_floor, _scale, _offset, _canvasWindow, painter);
-    painter->setPen(QPen(QBrush("blue"), 8, Qt::SolidLine, Qt::RoundCap));
-    _container.paintPolygons(_floor, _scale, _offset, _canvasWindow, painter);
-    painter->setPen(QPen(QBrush("yellow"), 8, Qt::SolidLine, Qt::RoundCap));
-    _container.paintTemp(_scale, _offset, _canvasWindow, painter);
+    painter->setPen(QPen(QBrush("red"), 6, Qt::SolidLine, Qt::RoundCap));
+    _container.paintLines(_floor, _scale, _offset, _canvasWindow, painter, true);
+    painter->setBrush(QBrush("blue", Qt::SolidPattern));
+    painter->setPen(QPen(QBrush("blue"), 6, Qt::SolidLine, Qt::RoundCap));
+    _container.paintPolygons(_floor, _scale, _offset, _canvasWindow, painter, true);
+    painter->setPen(QPen(QBrush("yellow"), 6, Qt::SolidLine, Qt::RoundCap));
+    _container.paintTemp(_scale, _offset, _canvasWindow, painter, true);
 
     if (!_isDragging)
     {

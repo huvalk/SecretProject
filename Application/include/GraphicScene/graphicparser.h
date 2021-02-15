@@ -1,6 +1,7 @@
 #pragma once
 
 #include <GraphicScene/graphicpoint.h>
+#include <GraphicScene/graphicpolygon.h>
 #include <GraphicScene/graphicline.h>
 #include <GraphicScene/graphictypes.h>
 #include <map>
@@ -23,5 +24,6 @@ private:
     std::tuple<bool, QStringRef, double> parseDouble(QStringRef &json);
     std::tuple<bool, QStringRef, std::set<std::shared_ptr<GraphicLine>>> parseLines(QStringRef &json);
     std::tuple<bool, QStringRef, std::shared_ptr<GraphicLine>> parseLine(QStringRef &json);
-
+    std::tuple<bool, QStringRef, std::set<std::shared_ptr<GraphicPolygon>>> parsePolygons(QStringRef &json);
+    std::tuple<bool, QStringRef, std::shared_ptr<GraphicPolygon>> parsePolygon(QStringRef &json);
 };
