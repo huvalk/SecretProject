@@ -7,41 +7,108 @@ GraphicParser::GraphicParser()
 
 }
 
-QString GraphicParser::generateJSONScene(const GraphicTypes::building<GraphicLine> &scene)
+QString GraphicParser::generateJSONScene(const GraphicTypes::building<GraphicLine> &scene, const GraphicTypes::building<GraphicPolygon> &polygons)
 {
+    int lowScene = 0;
+    auto sceneIt = scene.begin();
+    auto polyIt = polygons.begin();
+    auto sceneEnd = scene.end();
+    auto polyEnd = polygons.end();
     QString _jsonScene = "{";
-        for(auto i = scene.begin(); i != scene.end(); ++i)
-        {
-            _jsonScene.append(QString::number(i->first));
-            _jsonScene.append(": { lines: [");
 
-            for(auto& item: i->second)
-            {
-                _jsonScene.append("{");
-                auto point = item->getFirstPoint();
-                _jsonScene.append(QString::number(point.x()));
-                _jsonScene.append(", ");
-                _jsonScene.append(QString::number(point.y()));
-                _jsonScene.append(", ");
-                point = item->getSecondPoint();
-                _jsonScene.append(QString::number(point.x()));
-                _jsonScene.append(", ");
-                _jsonScene.append(QString::number(point.y()));
-                _jsonScene.append("}, ");
-            }
-            if (i->second.size() != 0)
-            {
-                _jsonScene.remove(_jsonScene.size() - 2, 2);
-            }
-            _jsonScene.append("]}, ");
-        }
-        if (scene.size() != 0)
+    for(; sceneIt != sceneEnd && polyIt != polyEnd ;)
+    {
+        if (sceneIt->first <= polyIt->first && sceneIt != sceneEnd)
         {
-            _jsonScene.remove(_jsonScene.size() - 2, 2);
-        }
-        _jsonScene.append("}");
+            lowScene = sceneIt->first;
+            _jsonScene.append(QString::number(sceneIt->first));
 
-        return _jsonScene;
+            _jsonScene.append(": { ");
+            generateJSONLines(sceneIt->second, _jsonScene);
+
+            if (polyIt->first == lowScene)
+            {
+                _jsonScene.append(", ");
+                generateJSONPolygons(polyIt->second, _jsonScene);
+                polyIt++;
+            }
+            sceneIt++;
+
+            _jsonScene.append("}, ");
+        } else if (polyIt != polyEnd)
+        {
+            _jsonScene.append(QString::number(polyIt->first));
+
+            _jsonScene.append(": { ");
+            generateJSONPolygons(polyIt->second, _jsonScene);
+            polyIt++;
+            _jsonScene.append("}, ");
+        }
+    }
+
+
+    if (scene.size() != 0)
+    {
+        _jsonScene.remove(_jsonScene.size() - 2, 2);
+    }
+    _jsonScene.append("}");
+
+    return _jsonScene;
+}
+
+void GraphicParser::generateJSONLines(const GraphicTypes::floor<GraphicLine>& scene, QString &jsonScene)
+{
+    jsonScene.append("lines: [");
+
+    for(auto& item: scene)
+    {
+        jsonScene.append("{");
+        auto point = item->getFirstPoint();
+        jsonScene.append(QString::number(point.x()));
+        jsonScene.append(", ");
+        jsonScene.append(QString::number(point.y()));
+        jsonScene.append(", ");
+        point = item->getSecondPoint();
+        jsonScene.append(QString::number(point.x()));
+        jsonScene.append(", ");
+        jsonScene.append(QString::number(point.y()));
+        jsonScene.append("}, ");
+    }
+    if (scene.size() != 0)
+    {
+        jsonScene.remove(jsonScene.size() - 2, 2);
+    }
+    jsonScene.append("]");
+}
+
+void GraphicParser::generateJSONPolygons(const GraphicTypes::floor<GraphicPolygon>& polygons, QString &jsonScene)
+{
+    jsonScene.append("polys: [");
+
+    for(auto& item: polygons)
+    {
+        jsonScene.append("{");
+        auto polyPoints = item->getPolygonPoints();
+        for (const auto &point: polyPoints)
+        {
+            jsonScene.append(QString::number(point.x()));
+            jsonScene.append(", ");
+            jsonScene.append(QString::number(point.y()));
+            jsonScene.append(", ");
+        }
+
+        if (polyPoints.size() != 0)
+        {
+            jsonScene.remove(jsonScene.size() - 2, 2);
+        }
+        jsonScene.append("}, ");
+    }
+
+    if (polygons.size() != 0)
+    {
+        jsonScene.remove(jsonScene.size() - 2, 2);
+    }
+    jsonScene.append("]");
 }
 
 QStringRef GraphicParser::eraseSpaces(QStringRef &json)
@@ -97,7 +164,7 @@ std::tuple<bool, QStringRef, double> GraphicParser::parseDouble(QStringRef &json
      return std::make_tuple(true, json, num);
 }
 
-std::pair<bool, GraphicTypes::building<GraphicLine>> GraphicParser::parseJSONScene(QString json)
+std::tuple<bool, GraphicTypes::building<GraphicLine>, GraphicTypes::building<GraphicPolygon>> GraphicParser::parseJSONScene(QString json)
 {
     QStringRef subStr(&json);
     int state = 0;
@@ -231,7 +298,7 @@ std::pair<bool, GraphicTypes::building<GraphicLine>> GraphicParser::parseJSONSce
         subStr = eraseSpaces(subStr);
     }
 
-    return std::make_pair((noErr && state == 9), std::move(lines));
+    return std::make_tuple((noErr && state == 9), std::move(lines), std::move(polygons));
 }
 
 std::tuple<bool, QStringRef, std::set<std::shared_ptr<GraphicLine>>> GraphicParser::parseLines(QStringRef &json)

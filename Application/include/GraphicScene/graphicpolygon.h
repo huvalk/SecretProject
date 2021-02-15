@@ -15,8 +15,7 @@ public:
     void paint(QPainter* painter, const QPointF& offset, const uint8_t scale, const bool extColor = false) override;
     void moveTo(const QPointF& offset) override;
     void moveTo(const double x, const double y) override;
-    double getYbyX(double x) const;
-    double getXbyY(double y) const;
+    QPolygonF getPolygonPoints();
 
     ~GraphicPolygon() override;
 

@@ -303,13 +303,13 @@ GraphicTypes::building<GraphicLine>::iterator GraphicContainer::endLines()
 
 QString GraphicContainer::generateJSONScene()
 {
-    return _parser.generateJSONScene(_lines);
+    return _parser.generateJSONScene(_lines, _polygons);
 }
 
 std::pair<bool, QVector<int> > GraphicContainer::parseJSONScene(QString json)
 {
     bool result = true;
-    std::tie(result, _lines) = _parser.parseJSONScene(json);
+    std::tie(result, _lines, _polygons) = _parser.parseJSONScene(json);
 
     QVector<int> floors{};
     if (result)

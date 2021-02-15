@@ -67,6 +67,11 @@ void GraphicPolygon::moveTo(const double x, const double y)
     qWarning() << "Not implemented";
 }
 
+QPolygonF GraphicPolygon::getPolygonPoints()
+{
+    return _poly;
+}
+
 GraphicPolygon::~GraphicPolygon()
 {
 }
