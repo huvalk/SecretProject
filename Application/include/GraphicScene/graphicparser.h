@@ -1,8 +1,8 @@
 #pragma once
 
-#include <GraphicScene/graphicpoint.h>
-#include <GraphicScene/graphicpolygon.h>
-#include <GraphicScene/graphicline.h>
+#include <GraphicScene/Items/graphicpoint.h>
+#include <GraphicScene/Items/graphicpolygon.h>
+#include <GraphicScene/Items/graphicline.h>
 #include <GraphicScene/graphictypes.h>
 #include <map>
 #include <memory>

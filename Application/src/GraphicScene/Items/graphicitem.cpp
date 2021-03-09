@@ -1,4 +1,4 @@
-#include "GraphicScene/graphicitem.h"
+#include "GraphicScene/Items/graphicitem.h"
 #include "cmath"
 
 GraphicItem::GraphicItem(QRectF&& boundingRect, bool visable)

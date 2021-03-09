@@ -1,5 +1,5 @@
 #include <cmath>
-#include "GraphicScene/graphicline.h"
+#include "GraphicScene/Items/graphicline.h"
 #include <QDebug>
 
 GraphicLine::GraphicLine(const QPointF& firstPoint, const QPointF& secondPoint)

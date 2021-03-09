@@ -1,9 +1,10 @@
 ﻿#pragma once
 
 #include <GraphicScene/graphiccontainer.h>
-#include <GraphicScene/graphicpoint.h>
-#include <GraphicScene/graphicline.h>
-#include <GraphicScene/graphicimage.h>
+#include <GraphicScene/graphicpainter.h>
+#include <GraphicScene/Items/graphicpoint.h>
+#include <GraphicScene/Items/graphicline.h>
+#include <GraphicScene/Items/graphicimage.h>
 #include <map>
 #include <memory>
 #include <set>
@@ -70,8 +71,8 @@ private:
     QRectF                         _changeArea;
     QPointF                        _offset;
     QPoint                          _dragPoint;
-    std::unique_ptr<GraphicPoint> _cursorPoint;
-    std::unique_ptr<GraphicImage>_image;
+    std::shared_ptr<GraphicPoint> _cursorPoint;
+    std::shared_ptr<GraphicImage>_image;
     GraphicContainer         _container;
     double                          _canvasWidth;
     double                          _canvasHeight;
@@ -115,5 +116,4 @@ private:
     void keyPressEvent(QKeyEvent *event) override;
     void keyReleaseEvent(QKeyEvent *event) override;
     void focusInEvent(QFocusEvent * event) override;
-
 };

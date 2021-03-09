@@ -16,18 +16,20 @@ SOURCES += \
         src/DataBase/commondatabase.cpp \
         src/DataBase/connectionmanager.cpp \
         src/GraphicScene/graphiccontainer.cpp \
-        src/GraphicScene/graphicimage.cpp \
-        src/GraphicScene/graphicitem.cpp \
-        src/GraphicScene/graphicline.cpp \
+        src/GraphicScene/Items/graphicimage.cpp \
+        src/GraphicScene/Items/graphicitem.cpp \
+        src/GraphicScene/Items/graphicline.cpp \
+        src/GraphicScene/graphicpainter.cpp \
         src/GraphicScene/graphicparser.cpp \
-        src/GraphicScene/graphicpoint.cpp \
-        src/GraphicScene/graphicpolygon.cpp \
+        src/GraphicScene/Items/graphicpoint.cpp \
+        src/GraphicScene/Items/graphicpolygon.cpp \
         src/GraphicScene/graphicscene.cpp \
         src/MapFileModel/mapfile.cpp \
         src/MapFileModel/mapfilemodel.cpp \
         src/MapFileModel/mapfilereader.cpp \
         main.cpp \
         src/MapFloorsModel/mapfloorsmodel.cpp
+
 
 RESOURCES += qml.qrc
 
@@ -48,12 +50,13 @@ HEADERS += \
     include/DataBase/connectionmanager.h \
     include/DataBase/dbtypes.h \
     include/GraphicScene/graphiccontainer.h \
-    include/GraphicScene/graphicimage.h \
-    include/GraphicScene/graphicitem.h \
-    include/GraphicScene/graphicline.h \
+    include/GraphicScene/Items/graphicimage.h \
+    include/GraphicScene/Items/graphicitem.h \
+    include/GraphicScene/Items/graphicline.h \
+    include/GraphicScene/graphicpainter.h \
     include/GraphicScene/graphicparser.h \
-    include/GraphicScene/graphicpoint.h \
-    include/GraphicScene/graphicpolygon.h \
+    include/GraphicScene/Items/graphicpoint.h \
+    include/GraphicScene/Items/graphicpolygon.h \
     include/GraphicScene/graphicscene.h \
     include/GraphicScene/graphictypes.h \
     include/MapFileModel/mapfile.h \

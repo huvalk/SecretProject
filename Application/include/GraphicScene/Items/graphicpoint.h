@@ -1,11 +1,13 @@
 #pragma once
 
-#include "GraphicScene/graphicitem.h"
+#include "GraphicScene/Items/graphicitem.h"
+#include "QColor"
 
-class GraphicPolygon: public GraphicItem
+class GraphicPoint: public GraphicItem
 {
 public:
-    GraphicPolygon (const QPolygonF &poly);
+    GraphicPoint(double x, double y, int radius, int8_t border, QColor strokeStyle = "#000000", QColor fillStyle = "#38DF64");
+    GraphicPoint(const QPointF& pos, int radius, int8_t border, QColor strokeStyle = "#000000", QColor fillStyle = "#38DF64");
 
     QPointF pos() override;
     bool redrawRequest(const QRectF& changeArea) override;
@@ -15,13 +17,15 @@ public:
     void paint(QPainter* painter, const QPointF& offset, const uint8_t scale, const bool extColor = false) override;
     void moveTo(const QPointF& offset) override;
     void moveTo(const double x, const double y) override;
-    QPolygonF getPolygonPoints();
 
-    ~GraphicPolygon() override;
+    ~GraphicPoint() override;
 
 private:
+    QColor  _strokeStyle;
     QColor  _fillStyle;
-    QPolygonF _poly;
-    std::vector<QPointF> _points;
+    QPointF  _topLeft;
+    QPointF  _center;
+    int     _radius;
+    int     _diametr;
+    int8_t  _border;
 };
-

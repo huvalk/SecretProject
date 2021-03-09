@@ -1,5 +1,5 @@
 #include <cmath>
-#include "GraphicScene/graphicpolygon.h"
+#include "GraphicScene/Items/graphicpolygon.h"
 #include <QDebug>
 
 GraphicPolygon::GraphicPolygon(const QPolygonF &poly)

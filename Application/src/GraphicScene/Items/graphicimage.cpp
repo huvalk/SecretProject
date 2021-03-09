@@ -1,5 +1,5 @@
 #include <cmath>
-#include "GraphicScene/graphicimage.h"
+#include "GraphicScene/Items/graphicimage.h"
 #include <QDebug>
 
 GraphicImage::GraphicImage(const double x, const double y, const QString path)

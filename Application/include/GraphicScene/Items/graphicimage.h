@@ -1,11 +1,12 @@
 #pragma once
 
-#include "GraphicScene/graphicitem.h"
+#include "GraphicScene/Items/graphicitem.h"
 
-class GraphicLine: public GraphicItem
+class GraphicImage: public GraphicItem
 {
 public:
-    GraphicLine(const QPointF& firstPoint, const QPointF& secondPoint);
+    GraphicImage(const double x, const double y, const QString path);
+    GraphicImage(const QPointF& pos, const QString path);
 
     QPointF pos() override;
     bool redrawRequest(const QRectF& changeArea) override;
@@ -15,17 +16,13 @@ public:
     void paint(QPainter* painter, const QPointF& offset, const uint8_t scale, const bool extColor = false) override;
     void moveTo(const QPointF& offset) override;
     void moveTo(const double x, const double y) override;
-    double getYbyX(double x) const;
-    double getXbyY(double y) const;
-    const QPointF& getFirstPoint() const;
-    const QPointF& getSecondPoint() const;
+    void setImage(const QString& path);
 
-    ~GraphicLine() override;
+    ~GraphicImage() override;
 
 private:
-    QColor  _fillStyle;
-    QPointF _firstPoint;
-    QPointF _secondPoint;
-    int8_t  _width;
+    QImage    _image;
+    QRectF     _source;
+    QRectF    _target;
+    QPointF  _topLeft;
 };
-

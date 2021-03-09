@@ -1,5 +1,5 @@
 #include <cmath>
-#include "GraphicScene/graphicpoint.h"
+#include "GraphicScene/Items/graphicpoint.h"
 #include <QDebug>
 
 GraphicPoint::GraphicPoint(double x, double y, int radius, int8_t border, QColor strokeStyle, QColor fillStyle)

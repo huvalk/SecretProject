@@ -1,4 +1,5 @@
 #include "GraphicScene/graphicscene.h"
+#include "GraphicScene/graphicpainter.h"
 #include <cmath>
 #include <QtMath>
 #include <QSGFlatColorMaterial>
@@ -12,7 +13,7 @@ GraphicScene::GraphicScene(QQuickItem *parent):
     _changeArea(_canvasWindow),
     _offset(0, 0),
     _dragPoint(0, 0),
-    _image(std::make_unique<GraphicImage>(0, 0, "")),
+    _image(std::make_shared<GraphicImage>(0, 0, "")),
     _canvasWidth(),
     _canvasHeight(),
     _floor(1),
@@ -29,7 +30,7 @@ GraphicScene::GraphicScene(QQuickItem *parent):
     _backgroundFloorVisible(false),
     _ctrlPressed(false)
 {
-    _cursorPoint = std::make_unique<GraphicPoint>(0, 0, 5, 2, QColor("#A60000"), QColor("#FF9E00"));
+    _cursorPoint = std::make_shared<GraphicPoint>(0, 0, 5, 2, QColor("#A60000"), QColor("#FF9E00"));
 
     forceActiveFocus();
     setAcceptHoverEvents(true);
@@ -44,40 +45,21 @@ void GraphicScene::registerMe(const std::string& moduleName)
 
 void GraphicScene::paint(QPainter* painter)
 {
-    // TODO баг при загрузке до смены масштаба неправильное значение _canvasWindow
-    if (_scale > 1 && (_editingMod != EditingMod::Nothing))
-    {
-        drawGrid(painter);
-    }
-
-    if (_backgroundVisible && _image->redrawRequest(_canvasWindow))
-    {
-        _image->paint(painter, _offset, _scale);
-    }
-
-    painter->setRenderHint(QPainter::Antialiasing, true);
-    if (_backgroundFloorVisible && _backgroundFloor != _floor && (_editingMod != EditingMod::Nothing))
-    {
-        painter->setPen(QPen(QBrush("black"), 8, Qt::SolidLine, Qt::RoundCap));
-        _container.paintLines(_backgroundFloor, _scale, _offset, _canvasWindow, painter, true);
-    }
-
-    //TODO избавиться от changeArea пока
-    painter->setPen(QPen(QBrush("red"), 6, Qt::SolidLine, Qt::RoundCap));
-    _container.paintLines(_floor, _scale, _offset, _canvasWindow, painter, true);
-    painter->setBrush(QBrush("blue", Qt::SolidPattern));
-    painter->setPen(QPen(QBrush("blue"), 6, Qt::SolidLine, Qt::RoundCap));
-    _container.paintPolygons(_floor, _scale, _offset, _canvasWindow, painter, true);
-    painter->setPen(QPen(QBrush("yellow"), 6, Qt::SolidLine, Qt::RoundCap));
-    _container.paintTemp(_scale, _offset, _canvasWindow, painter, true);
-
-    if (!_isDragging)
-    {
-        painter->setRenderHint(QPainter::Antialiasing, false);
-        _container.paintPoints(_floor, _scale, _offset, _canvasWindow, painter);
-
-        _cursorPoint->paint(painter, _offset, _scale);
-    }
+    GraphicPainter::paint(painter,
+                   _container,
+                   _cursorPoint,
+                   _image,
+                    (_editingMod != EditingMod::Nothing),
+                   _backgroundVisible,
+                   _backgroundFloorVisible,
+                   _isDragging,
+                   _scale,
+                   _gridSize,
+                   _offset,
+                   _floor,
+                   _backgroundFloor,
+                   _canvasWindow,
+                   _changeArea);
 }
 
 QColor GraphicScene::backgroundColor() const
@@ -310,34 +292,6 @@ void GraphicScene::extendChangeArea(const QRectF &newRect)
     } else
     {
         _changeArea = _changeArea.united(newRect);
-    }
-}
-
-void GraphicScene::drawGrid(QPainter *painter)
-{
-    double x1 = _changeArea.x();
-    double y1 = _changeArea.y();
-    double x2 = x1 + _changeArea.width();
-    double y2 = y1 + _changeArea.height();
-    double startX = std::round((x1 + _offset.x()) / (_gridSize * _scale)) *
-                                  (_gridSize * _scale) - _offset.x();
-    double startY = std::round((y1 + _offset.y()) / (_gridSize * _scale)) *
-                                  (_gridSize * _scale) - _offset.y();
-
-    painter->setPen("#AAAAAA");
-    for (double i = startY; i <= y2; i += _gridSize * _scale)
-    {
-        painter->drawLine(static_cast<int>(x1),
-                          static_cast<int>(i),
-                          static_cast<int>(x2),
-                          static_cast<int>(i));
-    }
-    for (double i = startX; i <= x2; i += _gridSize * _scale)
-    {
-        painter->drawLine(static_cast<int>(i),
-                          static_cast<int>(y1),
-                          static_cast<int>(i),
-                          static_cast<int>(y2));
     }
 }
 

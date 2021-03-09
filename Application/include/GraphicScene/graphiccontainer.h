@@ -1,10 +1,10 @@
 #pragma once
 
-#include <GraphicScene/graphicpoint.h>
-#include <GraphicScene/graphicline.h>
+#include <GraphicScene/Items/graphicpoint.h>
+#include <GraphicScene/Items/graphicline.h>
 #include <GraphicScene/graphictypes.h>
 #include <GraphicScene/graphicparser.h>
-#include <GraphicScene/graphicpolygon.h>
+#include <GraphicScene/Items/graphicpolygon.h>
 #include <map>
 #include <memory>
 #include <set>
@@ -14,10 +14,10 @@ class GraphicContainer
 {
 public:
     GraphicContainer();
-    void paintLines(const int floor, const uint8_t scale, const QPointF& offset, const  QRectF& area, QPainter* painter, const bool bg = false);
-    void paintPoints(const int floor, const uint8_t scale, const QPointF& offset, const  QRectF& area, QPainter* painter, const bool extColor = false);
-    void paintPolygons(const int floor, const uint8_t scale, const QPointF& offset, const  QRectF& area, QPainter* painter, const bool extColor = false);
-    void paintTemp(const uint8_t scale, const QPointF& offset, const  QRectF& area, QPainter* painter, const bool extColor = false);
+    void paintPoints(const int floor, const uint8_t scale, const QPointF& offset, const  QRectF& area, QPainter* painter, const bool extColor = false) const;
+    void paintLines(const int floor, const uint8_t scale, const QPointF& offset, const  QRectF& area, QPainter* painter, const bool bg = false) const;
+    void paintPolygons(const int floor, const uint8_t scale, const QPointF& offset, const  QRectF& area, QPainter* painter, const bool extColor = false) const;
+    void paintTemp(const uint8_t scale, const QPointF& offset, const  QRectF& area, QPainter* painter, const bool extColor = false) const;
 
     std::pair<bool, QPointF>  lineAttachment(const int floor, const double startX, const double startY, const QPointF &pos);
     std::shared_ptr<GraphicPoint> findPoint(const int floor, const QPointF& pos);

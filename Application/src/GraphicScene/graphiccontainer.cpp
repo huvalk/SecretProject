@@ -8,7 +8,7 @@ GraphicContainer::GraphicContainer()
 
 }
 
-void GraphicContainer::paintLines(const int floor, const uint8_t scale, const QPointF& offset, const  QRectF& area, QPainter* painter, const bool bg)
+void GraphicContainer::paintLines(const int floor, const uint8_t scale, const QPointF& offset, const  QRectF& area, QPainter* painter, const bool bg) const
 {
     auto currentFloorLines = _lines.find(floor);
     if (currentFloorLines != _lines.end())
@@ -23,7 +23,7 @@ void GraphicContainer::paintLines(const int floor, const uint8_t scale, const QP
     }
 }
 
-void GraphicContainer::paintPoints(const int floor, const uint8_t scale, const QPointF& offset, const  QRectF& area, QPainter* painter, const bool extColor)
+void GraphicContainer::paintPoints(const int floor, const uint8_t scale, const QPointF& offset, const  QRectF& area, QPainter* painter, const bool extColor) const
 {
     auto currentFloorPoints = _points.find(floor);
     if (currentFloorPoints != _points.end())
@@ -38,7 +38,7 @@ void GraphicContainer::paintPoints(const int floor, const uint8_t scale, const Q
     }
 }
 
-void GraphicContainer::paintPolygons(const int floor, const uint8_t scale, const QPointF& offset, const  QRectF& area, QPainter* painter, const bool extColor)
+void GraphicContainer::paintPolygons(const int floor, const uint8_t scale, const QPointF& offset, const  QRectF& area, QPainter* painter, const bool extColor) const
 {
     auto currentFloorPolys = _polygons.find(floor);
     if (currentFloorPolys != _polygons.end())
@@ -53,7 +53,7 @@ void GraphicContainer::paintPolygons(const int floor, const uint8_t scale, const
     }
 }
 
-void GraphicContainer::paintTemp(const uint8_t scale, const QPointF& offset, const  QRectF& area, QPainter* painter, const bool extColor)
+void GraphicContainer::paintTemp(const uint8_t scale, const QPointF& offset, const  QRectF& area, QPainter* painter, const bool extColor) const
 {
     for (auto item: _temp)
     {
