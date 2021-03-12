@@ -5,6 +5,7 @@
 #include <GraphicScene/Items/graphicimage.h>
 #include <GraphicScene/Items/graphicpoint.h>
 #include <GraphicScene/graphiccontainer.h>
+#include <GraphicScene/graphicconstructor.h>
 
 class GraphicPainter
 {
@@ -12,6 +13,7 @@ public:
     GraphicPainter();
     static void paint(QPainter* painter,
                const GraphicContainer &container,
+               const GraphicConstructor &constructor,
                const  std::shared_ptr<GraphicPoint> cursorPoint,
                const std::shared_ptr<GraphicImage> image,
                const bool &minimizePicture,

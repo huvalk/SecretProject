@@ -11,6 +11,7 @@ GraphicPainter::GraphicPainter()
 
  void GraphicPainter::paint(QPainter* const painter,
                            const GraphicContainer &container,
+                            const GraphicConstructor &constructor,
                            const  std::shared_ptr<GraphicPoint> cursorPoint,
                            const std::shared_ptr<GraphicImage> image,
                            const bool &minimizePicture,
@@ -55,8 +56,9 @@ GraphicPainter::GraphicPainter()
     painter->setBrush(QBrush("blue", Qt::SolidPattern));
     painter->setPen(QPen(QBrush("blue"), 6, Qt::SolidLine, Qt::RoundCap));
     container.paintPolygons(floor, scale, offset, canvasWindow, painter, true);
-    painter->setPen(QPen(QBrush("yellow"), 6, Qt::SolidLine, Qt::RoundCap));
-    container.paintTemp(scale, offset, canvasWindow, painter, true);
+    painter->setPen(QPen(QBrush("pink"), 1, Qt::SolidLine, Qt::RoundCap));
+    painter->setBrush(QBrush("pink", Qt::SolidPattern));
+    constructor.paintTemp(scale, offset, canvasWindow, painter, true);
 
     if (!isDragging)
     {

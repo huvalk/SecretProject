@@ -53,16 +53,6 @@ void GraphicContainer::paintPolygons(const int floor, const uint8_t scale, const
     }
 }
 
-void GraphicContainer::paintTemp(const uint8_t scale, const QPointF& offset, const  QRectF& area, QPainter* painter, const bool extColor) const
-{
-    for (auto item: _temp)
-    {
-        if (item->redrawRequest(area))
-        {
-            item->paint(painter, offset, scale, extColor);
-        }
-    }
-}
 
 std::pair<bool, QPointF> GraphicContainer::lineAttachment(const int floor, const double startX, const double startY, const QPointF &pos)
 {
@@ -142,85 +132,30 @@ std::shared_ptr<GraphicLine> GraphicContainer::findLine(const int floor, const Q
     return nullptr;
 }
 
-std::pair<bool, QRectF> GraphicContainer::addPoint(const int floor, const QPointF &pos)
+QRectF GraphicContainer::addPoint(const int floor, const QPointF &pos)
 {
-    _tempPoint = findPoint(floor, pos);
-    if (_tempPoint == nullptr)
+    auto tempPoint = findPoint(floor, pos);
+    if (tempPoint == nullptr)
     {
-        _tempPoint = std::make_shared<GraphicPoint>(pos, _pointSize, 2);
-        _points[floor].insert(_tempPoint);
+        tempPoint = std::make_shared<GraphicPoint>(pos, _pointSize, 2);
+        _points[floor].insert(tempPoint);
     }
-    return std::make_pair(true, _tempPoint->boundingRect());
+    return tempPoint->boundingRect();
 }
 
-std::pair<bool, QRectF> GraphicContainer::addLine(const int floor, const QPointF &pos)
+QRectF GraphicContainer::addLine(const int floor, const QLineF &line)
 {
-    auto currentFloor = _points.find(floor);
-    if (_tempPoint->wasClicked(pos) || currentFloor == _points.end())
-    {
-        return std::make_pair(true, QRectF());
-    }
+    auto newLine = std::make_shared<GraphicLine>(line.p1(), line.p2());
+    _lines[floor].insert(newLine);
 
-    _lines[floor].emplace(std::make_shared<GraphicLine>(_tempPoint->pos(), pos));
-    auto result = std::make_pair(true, _tempPoint->boundingRect());
-    auto pointInPos = findPoint(floor, pos);
-    if (pointInPos != nullptr)
-    {
-        result.second = result.second.united(pointInPos->boundingRect());
-    }
-    currentFloor->second.erase(_tempPoint);
-    currentFloor->second.erase(pointInPos);
-    _tempPoint = nullptr;
-
-    return result;
+    return newLine->boundingRect();
 }
 
-std::pair<bool, QRectF> GraphicContainer::addPolygon(const int floor, const QPolygonF &poly)
+QRectF GraphicContainer::addPolygon(const int floor, const QPolygonF &poly)
 {
     _polygons[floor].insert(std::make_shared<GraphicPolygon>(poly));
 
-    return std::make_pair(true, poly.boundingRect());
-}
-
-// Начинается создание полигона
-std::pair<bool, QRectF> GraphicContainer::addTempPoint(const QPointF &pos)
-{
-    qDebug() << "tempPos created";
-    _tempPoint = std::make_shared<GraphicPoint>(pos, _pointSize, 2);
-    _tempPos = std::make_shared<QPointF>(_tempPoint->pos());
-    _temp.insert(_tempPoint);
-    _tempPoly.clear();
-
-    return std::make_pair(true, _tempPoint->boundingRect());
-}
-
-// Дополнительная переменная для завершения создания
-// Здесьже формируется полигон
-std::tuple<bool, QPolygonF, QRectF>  GraphicContainer::addTempLine(const QPointF &pos)
-{
-    if (_tempPos == nullptr)
-    {
-        qWarning() << "tempPos is null";
-        return std::make_tuple(false, QPolygonF(), QRectF());
-    }
-    auto newTempLine = std::make_shared<GraphicLine>(*_tempPos, pos);
-    _temp.emplace(newTempLine);
-    _tempPos = std::make_shared<QPointF>(pos);
-    _tempPoly.append(pos);
-
-    if (_tempPoint->wasClicked(pos))
-    {
-        auto result = std::make_tuple(true, _tempPoly, _tempPoly.boundingRect());
-
-        _tempPoint = nullptr;
-        _tempPos = nullptr;
-        _tempPoly.clear();
-        _temp.clear();
-
-        return result;
-    }
-
-    return std::make_tuple(true, QPolygonF(), newTempLine->boundingRect());
+    return poly.boundingRect();
 }
 
 bool GraphicContainer::clearPoints(const int floor)
@@ -232,17 +167,6 @@ bool GraphicContainer::clearPoints(const int floor)
     }
 
     currentFloor->second.clear();
-    return true;
-}
-
-bool GraphicContainer::clearTemp()
-{
-    if (_temp.size() == 0)
-    {
-        return false;
-    }
-
-    _temp.clear();
     return true;
 }
 
@@ -261,8 +185,8 @@ std::pair<bool, QRectF> GraphicContainer::deleteItem(const int floor, const QPoi
 
     if (line != nullptr)
     {
-        addPoint(floor, line->getFirstPoint());
-        addPoint(floor, line->getSecondPoint());
+//        addPoint(floor, line->getFirstPoint());
+//        addPoint(floor, line->getSecondPoint());
         _lines[floor].erase(line);
 
         return std::make_pair(true, line->boundingRect());

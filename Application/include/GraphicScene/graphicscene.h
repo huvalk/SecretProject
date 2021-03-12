@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include <GraphicScene/graphiccontainer.h>
+#include <GraphicScene/graphicconstructor.h>
 #include <GraphicScene/graphicpainter.h>
 #include <GraphicScene/Items/graphicpoint.h>
 #include <GraphicScene/Items/graphicline.h>
@@ -74,6 +75,7 @@ private:
     std::shared_ptr<GraphicPoint> _cursorPoint;
     std::shared_ptr<GraphicImage>_image;
     GraphicContainer         _container;
+    GraphicConstructor      _constructor;
     double                          _canvasWidth;
     double                          _canvasHeight;
     int                                _floor;

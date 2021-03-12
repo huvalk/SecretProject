@@ -47,6 +47,7 @@ void GraphicScene::paint(QPainter* painter)
 {
     GraphicPainter::paint(painter,
                    _container,
+                   _constructor,
                    _cursorPoint,
                    _image,
                     (_editingMod != EditingMod::Nothing),
@@ -315,7 +316,7 @@ void GraphicScene::mousePressEvent(QMouseEvent *event)
         switch (event->button())
         {
         case Qt::LeftButton:
-            std::tie(result, std::ignore) = _container.addPoint(_floor, _cursorPoint->pos());
+            std::tie(result, std::ignore) = _constructor.addTempPoint(_cursorPoint->pos());
             _lineBegins = true;
             break;
         case Qt::RightButton:
@@ -333,7 +334,7 @@ void GraphicScene::mousePressEvent(QMouseEvent *event)
             if (_polyBegins == false)
             {
                 qDebug() << "start creating";
-                std::tie(result, std::ignore) = _container.addTempPoint(_cursorPoint->pos());
+                std::tie(result, std::ignore) = _constructor.addTempPoint(_cursorPoint->pos());
                 _polyBegins = true;
             }
             break;
@@ -341,7 +342,7 @@ void GraphicScene::mousePressEvent(QMouseEvent *event)
             if (_polyBegins == true)
             {
                 _polyBegins = false;
-                _container.clearTemp();
+                _constructor.clearTemp();
             } else {
                 std::tie(result, std::ignore)  = _container.deleteItem(_floor, _cursorPoint->pos());
             }
@@ -380,14 +381,20 @@ void GraphicScene::mousePressEvent(QMouseEvent *event)
 
 void GraphicScene::mouseReleaseEvent(QMouseEvent *event)
 {
-    bool result = false;
+    bool refresh = false;
     switch (_editingMod)
     {
     case EditingMod::CreateWalls:
         if (event->button() == Qt::LeftButton && _lineBegins)
         {
-            std::tie(result, std::ignore)  = _container.addLine(_floor, _cursorPoint->pos());
-            _lineBegins = !result;
+            QLineF newLine;
+            std::tie(refresh, newLine, std::ignore) = _constructor.constructLine(_cursorPoint->pos());
+            if (refresh == true)
+            {
+                _container.addLine(_floor, newLine);
+                _constructor.clearTemp();
+                _lineBegins = !refresh;
+            }
         }
         break;
 
@@ -396,11 +403,12 @@ void GraphicScene::mouseReleaseEvent(QMouseEvent *event)
         {
             QPolygonF newPoly;
             // TODO обернуть создание компонентов в отдельный класс
-            std::tie(result, newPoly, std::ignore)  = _container.addTempLine(_cursorPoint->pos());
+            std::tie(refresh, newPoly, std::ignore)  = _constructor.constructPoly(_cursorPoint->pos());
 
-            if (newPoly.size() > 0)
+            if (refresh == true && newPoly.size() > 0)
             {
                 _polyBegins = false;
+                _constructor.clearTemp();
                 if (newPoly.size() > 1)
                 {
                     _container.addPolygon(_floor, newPoly);
@@ -421,6 +429,8 @@ void GraphicScene::mouseReleaseEvent(QMouseEvent *event)
         }
         break;
 
+        // TODO добавить режим установки меты
+
     default:
         break;
     }
@@ -430,7 +440,7 @@ void GraphicScene::mouseReleaseEvent(QMouseEvent *event)
         dragEnds(event->pos());
     }
 
-    if (result)
+    if (refresh)
     {
         update();
     }

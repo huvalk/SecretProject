@@ -19,6 +19,7 @@ SOURCES += \
         src/GraphicScene/Items/graphicimage.cpp \
         src/GraphicScene/Items/graphicitem.cpp \
         src/GraphicScene/Items/graphicline.cpp \
+        src/GraphicScene/graphiccontructor.cpp \
         src/GraphicScene/graphicpainter.cpp \
         src/GraphicScene/graphicparser.cpp \
         src/GraphicScene/Items/graphicpoint.cpp \
@@ -49,6 +50,7 @@ HEADERS += \
     include/DataBase/commondatabase.h \
     include/DataBase/connectionmanager.h \
     include/DataBase/dbtypes.h \
+    include/GraphicScene/graphicconstructor.h \
     include/GraphicScene/graphiccontainer.h \
     include/GraphicScene/Items/graphicimage.h \
     include/GraphicScene/Items/graphicitem.h \
