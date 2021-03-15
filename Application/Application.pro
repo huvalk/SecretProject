@@ -1,4 +1,4 @@
-QT += quick sql
+QT += quick sql network
 CONFIG += c++17
 
 # The following define makes your compiler emit warnings if you use
@@ -15,13 +15,15 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
         src/DataBase/commondatabase.cpp \
         src/DataBase/connectionmanager.cpp \
+        src/GraphicScene/PathFinder/customqueue.cpp \
+        src/GraphicScene/PathFinder/listgraph.cpp \
+        src/GraphicScene/PathFinder/pathfinder.cpp \
         src/GraphicScene/graphiccontainer.cpp \
         src/GraphicScene/Items/graphicimage.cpp \
         src/GraphicScene/Items/graphicitem.cpp \
         src/GraphicScene/Items/graphicline.cpp \
         src/GraphicScene/graphiccontructor.cpp \
         src/GraphicScene/graphicpainter.cpp \
-        src/GraphicScene/graphicparser.cpp \
         src/GraphicScene/Items/graphicpoint.cpp \
         src/GraphicScene/Items/graphicpolygon.cpp \
         src/GraphicScene/graphicscene.cpp \
@@ -50,13 +52,16 @@ HEADERS += \
     include/DataBase/commondatabase.h \
     include/DataBase/connectionmanager.h \
     include/DataBase/dbtypes.h \
+    include/GraphicScene/PathFinder/customqueue.h \
+    include/GraphicScene/PathFinder/graphtypes.h \
+    include/GraphicScene/PathFinder/listgraph.h \
+    include/GraphicScene/PathFinder/pathfinder.h \
     include/GraphicScene/graphicconstructor.h \
     include/GraphicScene/graphiccontainer.h \
     include/GraphicScene/Items/graphicimage.h \
     include/GraphicScene/Items/graphicitem.h \
     include/GraphicScene/Items/graphicline.h \
     include/GraphicScene/graphicpainter.h \
-    include/GraphicScene/graphicparser.h \
     include/GraphicScene/Items/graphicpoint.h \
     include/GraphicScene/Items/graphicpolygon.h \
     include/GraphicScene/graphicscene.h \

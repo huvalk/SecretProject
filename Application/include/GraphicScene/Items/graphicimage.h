@@ -18,6 +18,9 @@ public:
     void moveTo(const double x, const double y) override;
     void setImage(const QString& path);
 
+    void write(QJsonObject &json) const override;
+    void read(const QJsonObject &json) override;
+
     ~GraphicImage() override;
 
 private:

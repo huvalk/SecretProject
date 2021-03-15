@@ -20,6 +20,9 @@ public:
     const QPointF& getFirstPoint() const;
     const QPointF& getSecondPoint() const;
 
+    void write(QJsonObject &json) const override;
+    void read(const QJsonObject &json) override;
+
     ~GraphicLine() override;
 
 private:

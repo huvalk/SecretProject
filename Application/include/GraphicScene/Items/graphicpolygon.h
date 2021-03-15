@@ -17,6 +17,9 @@ public:
     void moveTo(const double x, const double y) override;
     QPolygonF getPolygonPoints();
 
+    void write(QJsonObject &json) const override;
+    void read(const QJsonObject &json) override;
+
     ~GraphicPolygon() override;
 
 private:

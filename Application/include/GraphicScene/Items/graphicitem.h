@@ -3,6 +3,7 @@
 #include <GraphicScene/graphictypes.h>
 #include <QRectF>
 #include <QPainter>
+#include <QJsonObject>
 
 class GraphicItem
 {
@@ -23,13 +24,19 @@ public:
     virtual QRectF boundingRect();
     virtual bool pointInArea(const QPointF& pos);
     virtual bool pointInArea(double x, double y);
+    void setId(const uint16_t &id = 0);
+    uint16_t getId();
     void setVisable(bool visable = true);
     bool isVisable();
+
+    virtual void write(QJsonObject &json) const = 0;
+    virtual void read(const QJsonObject &json) = 0;
 
     virtual ~GraphicItem() = 0;
 
 protected:
     QRectF  _boundingRect;
+    uint16_t _id;
     bool    _visable;
 };
 

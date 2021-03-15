@@ -1,6 +1,7 @@
 #include <cmath>
 #include "GraphicScene/Items/graphicpolygon.h"
 #include <QDebug>
+#include <QJsonArray>
 
 GraphicPolygon::GraphicPolygon(const QPolygonF &poly)
     : GraphicItem(poly.boundingRect().topLeft(), poly.boundingRect().bottomRight(), true),
@@ -70,6 +71,56 @@ void GraphicPolygon::moveTo(const double x, const double y)
 QPolygonF GraphicPolygon::getPolygonPoints()
 {
     return _poly;
+}
+
+void GraphicPolygon::write(QJsonObject &json) const
+{
+    json["id"] = _id;
+    QJsonArray points;
+    for (const auto &point: _poly)
+    {
+        QJsonObject pointObject;
+        pointObject["x"] = point.x();
+        pointObject["y"] = point.y();
+
+        points.append(pointObject);
+    }
+
+    json["points"] = points;
+}
+
+void GraphicPolygon::read(const QJsonObject &json)
+{
+    if (json.contains("id") && json.contains("id"))
+    {
+        _id = static_cast<uint16_t>(json["id"].toInt(0));
+    } else {
+        qWarning() << "Missing id in poly";
+    }
+
+    if (json.contains("points") && json["points"].isArray())
+    {
+        QJsonArray pointsArray = json["points"].toArray();
+        _poly.clear();
+        _poly.reserve(pointsArray.size());
+
+        for (int i = 0; i < pointsArray.size(); ++i) {
+            QJsonObject pointObject = pointsArray[i].toObject();
+
+            if (pointObject.contains("x") && pointObject.contains("y"))
+            {
+                QPointF point;
+                point.setX(pointObject["x"].toDouble(0));
+                point.setY(pointObject["y"].toDouble(0));
+
+                _poly.append(point);
+            } else {
+                qWarning() << "Missing pos in point";
+            }
+        }
+    } else {
+        qWarning() << "Missing points array in poly";
+    }
 }
 
 GraphicPolygon::~GraphicPolygon()

@@ -111,7 +111,7 @@ void GraphicScene::setBackground(const QString path)
 void GraphicScene::setEditingMod(const int mod)
 {
     _editingMod = mod;
-    _container.clearPoints(_floor);
+    _constructor.clearTemp();
     qDebug() << _editingMod;
 }
 
@@ -333,7 +333,6 @@ void GraphicScene::mousePressEvent(QMouseEvent *event)
         case Qt::LeftButton:
             if (_polyBegins == false)
             {
-                qDebug() << "start creating";
                 std::tie(result, std::ignore) = _constructor.addTempPoint(_cursorPoint->pos());
                 _polyBegins = true;
             }
@@ -429,7 +428,18 @@ void GraphicScene::mouseReleaseEvent(QMouseEvent *event)
         }
         break;
 
-        // TODO добавить режим установки меты
+    case EditingMod::CreateLadder:
+        switch (event->button())
+        {
+        case Qt::LeftButton:
+            _container.addPoint(_floor, _cursorPoint->pos());
+            refresh = true;
+            break;
+
+        default:
+            break;
+        }
+        break;
 
     default:
         break;

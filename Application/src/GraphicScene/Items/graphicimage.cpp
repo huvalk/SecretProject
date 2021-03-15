@@ -83,6 +83,18 @@ void GraphicImage::setImage(const QString &path)
     _boundingRect.setSize(_image.size());
 }
 
+void GraphicImage::write(QJsonObject &json) const
+{
+    (void) json;
+    qWarning() << "Not implemented write in image";
+}
+
+void GraphicImage::read(const QJsonObject &json)
+{
+    (void) json;
+    qWarning() << "Not implemented read in image";
+}
+
 GraphicImage::~GraphicImage()
 {
 }

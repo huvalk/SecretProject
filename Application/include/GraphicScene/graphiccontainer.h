@@ -3,7 +3,6 @@
 #include <GraphicScene/Items/graphicpoint.h>
 #include <GraphicScene/Items/graphicline.h>
 #include <GraphicScene/graphictypes.h>
-#include <GraphicScene/graphicparser.h>
 #include <GraphicScene/Items/graphicpolygon.h>
 #include <map>
 #include <memory>
@@ -35,8 +34,10 @@ public:
     QString generateJSONScene();
     std::pair<bool, QVector<int>> parseJSONScene(QString json);
 
+    QString write();
+    void read(QString json);
+
 private:
-    GraphicParser                                      _parser;
     GraphicTypes::building<GraphicPoint>  _points;
     GraphicTypes::building<GraphicLine>   _lines;
     GraphicTypes::building<GraphicPolygon>   _polygons;

@@ -131,6 +131,33 @@ const QPointF&  GraphicLine::getSecondPoint() const
     return _secondPoint;
 }
 
+void GraphicLine::write(QJsonObject &json) const
+{
+    json["x1"] = _firstPoint.x();
+    json["y1"] = _firstPoint.y();
+    json["x2"] = _secondPoint.x();
+    json["y2"] = _secondPoint.y();
+}
+
+void GraphicLine::read(const QJsonObject &json)
+{
+    if (json.contains("x1") && json.contains("y1"))
+    {
+        _firstPoint.setX(json["x1"].toDouble(0));
+        _firstPoint.setY(json["y1"].toDouble(0));
+    } else {
+        qWarning() << "Missing first point in line";
+    }
+
+    if (json.contains("x2") && json.contains("y2"))
+    {
+        _secondPoint.setX(json["x2"].toDouble(0));
+        _secondPoint.setY(json["y2"].toDouble(0));
+    } else {
+        qWarning() << "Missing second point in line";
+    }
+}
+
 GraphicLine::~GraphicLine()
 {
 }

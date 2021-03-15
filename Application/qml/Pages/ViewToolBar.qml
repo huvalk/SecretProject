@@ -167,6 +167,41 @@ Column {
         }
     }
 
+    Row {
+        EyeCheckBox {
+            id: _createLadderBtn
+
+            trueIndicator: Resources.images.eyeOpened
+            falseIndicator: Resources.images.eyeClosed
+            onCheckedChanged: {
+                if (checked) {
+                    canvas.setEditingMod(3)
+                } else {
+                    canvas.setEditingMod(0)
+                }
+            }
+        }
+
+        DefaultInput {
+            id: _ladderIdInput
+            anchors.verticalCenter: parent.verticalCenter
+            width: 40
+            height: 26
+
+            inputMethodHints: Qt.ImhFormattedNumbersOnly
+            color: _style.inputColor
+            selectionColor: _style.btnSecondaryColor
+            placeholderText: "id"
+
+            onTextChanged: {
+//                let floor = parseInt(text)
+//                if (!isNaN(floor)) {
+//                    canvas.setBackgroundFloor(floor)
+//                }
+            }
+        }
+    }
+
     DefaultButton {
         // под размер картинки 96*47
         id: _upFloor

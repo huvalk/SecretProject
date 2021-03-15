@@ -60,6 +60,7 @@ private:
         CreateWalls = 0,
         MoveBackground,
         CreateCamera,
+        CreateLadder,
         CreateMark,
         Nothing
     };

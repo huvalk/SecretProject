@@ -18,6 +18,9 @@ public:
     void moveTo(const QPointF& offset) override;
     void moveTo(const double x, const double y) override;
 
+    void write(QJsonObject &json) const override;
+    void read(const QJsonObject &json) override;
+
     ~GraphicPoint() override;
 
 private:

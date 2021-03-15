@@ -85,6 +85,31 @@ void GraphicPoint::moveTo(const double x, const double y)
     _boundingRect.moveTo(x - _border - _radius, y - _border - _radius);
 }
 
+void GraphicPoint::write(QJsonObject &json) const
+{
+    json["id"] = _id;
+    json["x"] = _center.x();
+    json["y"] = _center.y();
+}
+
+void GraphicPoint::read(const QJsonObject &json)
+{
+    if (json.contains("x") && json.contains("y"))
+    {
+        _center.setX(json["x"].toDouble(0));
+        _center.setY(json["y"].toDouble(0));
+    } else {
+        qWarning() << "Missing pos in point";
+    }
+
+    if (json.contains("id") && json.contains("id"))
+    {
+        _id = static_cast<uint16_t>(json["id"].toInt(0));
+    } else {
+        qWarning() << "Missing id in point";
+    }
+}
+
 GraphicPoint::~GraphicPoint()
 {
 }
