@@ -20,7 +20,6 @@ QPointF GraphicLine::pos()
 
 bool GraphicLine::redrawRequest(const QRectF &changeArea)
 {
-    qDebug() << _boundingRect;
     return _boundingRect.intersects(changeArea);
 }
 
@@ -123,6 +122,11 @@ double GraphicLine::getXbyY(double y) const
             (_line.p1().x() - _line.p2().x()) /
             (_line.p1().y() - _line.p2().y()) +
             _line.p1().x());
+}
+
+QLineF GraphicLine::getLine() const
+{
+    return _line;
 }
 
 const QPointF  GraphicLine::getFirstPoint() const

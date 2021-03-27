@@ -1,5 +1,6 @@
 #include <cmath>
 #include "GraphicScene/graphiccontainer.h"
+#include "GraphicScene/PathFinder/graphmanager.h"
 #include <QDebug>
 #include <QJsonDocument>
 #include <QJsonObject>
@@ -21,7 +22,6 @@ void GraphicContainer::paintLines(const int floor, const uint8_t scale, const QP
         {
             if (item->redrawRequest(area))
             {
-                qDebug() << "lines: " << offset << " - " << currentFloorLines->second.size();
                 item->paint(painter, offset, scale, bg);
             }
         }
@@ -233,6 +233,11 @@ GraphicTypes::building<GraphicLine>::iterator GraphicContainer::endLines()
 
 QString GraphicContainer::generateJSONScene()
 {
+    auto grap = std::make_shared<GraphManager>(_lines, _points);
+    for (const auto &item: grap->paths)
+    {
+        _lines[-1].insert(std::make_shared<GraphicLine>(item));
+    }
     return write();
 }
 
@@ -289,7 +294,7 @@ QString GraphicContainer::write()
     jsonMap["points"] = jsonPoints;
 
     QJsonDocument jsonDoc(jsonMap);
-    return QString::fromUtf8(jsonDoc.toJson(QJsonDocument::Indented));
+    return QString::fromUtf8(jsonDoc.toJson(QJsonDocument::Compact));
 }
 
 std::pair<bool, QVector<int> > GraphicContainer::parseJSONScene(QString json)

@@ -122,18 +122,21 @@ void GraphicScene::setCursorMod(const int mod)
 
 void GraphicScene::setBackgroundVisible(const bool is)
 {
+    qDebug() << is;
     _backgroundVisible = is;
     update();
 }
 
 void GraphicScene::setBackgroundFloor(const int floor)
 {
+    qDebug() << floor;
     _backgroundFloor = floor;
     update();
 }
 
 void GraphicScene::setBackgroundFloorVisible(const bool is)
 {
+    qDebug() << is;
     _backgroundFloorVisible = is;
     update();
 }

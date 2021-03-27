@@ -17,6 +17,7 @@ public:
     void moveTo(const double x, const double y) override;
     double getYbyX(double x) const;
     double getXbyY(double y) const;
+    QLineF getLine() const;
     const QPointF getFirstPoint() const;
     const QPointF getSecondPoint() const;
 

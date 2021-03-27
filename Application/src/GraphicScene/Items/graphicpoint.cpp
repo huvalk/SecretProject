@@ -108,6 +108,11 @@ void GraphicPoint::read(const QJsonObject &json)
     } else {
         qWarning() << "Missing id in point";
     }
+
+    _boundingRect = QRectF((_center.x() - _border - _radius),
+                  (_center.y() - _border - _radius),
+                  (2 * (_border + _radius)),
+                  (2 * (_border + _radius)));
 }
 
 GraphicPoint::~GraphicPoint()

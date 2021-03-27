@@ -121,6 +121,8 @@ void GraphicPolygon::read(const QJsonObject &json)
     } else {
         qWarning() << "Missing points array in poly";
     }
+
+    _boundingRect = QRectF(_poly.boundingRect().topLeft(), _poly.boundingRect().bottomRight());
 }
 
 GraphicPolygon::~GraphicPolygon()

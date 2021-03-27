@@ -37,7 +37,7 @@ GraphicPainter::GraphicPainter()
                  backgroundFloor,
                  changeArea);
     }
- /*
+
     if (backgroundVisible && image->redrawRequest(canvasWindow))
     {
         image->paint(painter, offset, scale);
@@ -52,17 +52,14 @@ GraphicPainter::GraphicPainter()
 
     //TODO избавиться от changeArea пока
 
-    */
-    painter->setPen(QPen(QBrush("red"), 6, Qt::SolidLine, Qt::RoundCap));
+     painter->setPen(QPen(QBrush("red"), 6, Qt::SolidLine, Qt::RoundCap));
     container.paintLines(floor, scale, offset, canvasWindow, painter, true);
-    /*
     painter->setBrush(QBrush("blue", Qt::SolidPattern));
     painter->setPen(QPen(QBrush("blue"), 6, Qt::SolidLine, Qt::RoundCap));
     container.paintPolygons(floor, scale, offset, canvasWindow, painter, true);
     painter->setPen(QPen(QBrush("pink"), 1, Qt::SolidLine, Qt::RoundCap));
     painter->setBrush(QBrush("pink", Qt::SolidPattern));
     constructor.paintTemp(scale, offset, canvasWindow, painter, true);
-    */
 
     if (!isDragging)
     {
