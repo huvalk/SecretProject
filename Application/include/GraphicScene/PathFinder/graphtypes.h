@@ -1,11 +1,11 @@
 #pragma once
 
-#include <cstddef>
+#include <cstdint>
 #include <utility>
 
 namespace GraphTypes
 {
-using Node = size_t;
+using Node = uint64_t;
 
 using Edge = std::pair< Node, double >;
 }

@@ -21,6 +21,7 @@ void GraphicContainer::paintLines(const int floor, const uint8_t scale, const QP
         {
             if (item->redrawRequest(area))
             {
+                qDebug() << "lines: " << offset << " - " << currentFloorLines->second.size();
                 item->paint(painter, offset, scale, bg);
             }
         }

@@ -13,6 +13,7 @@ void GraphicConstructor::paintTemp(const uint8_t scale, const QPointF& offset, c
     {
         if (item->redrawRequest(area))
         {
+            qDebug() << "temp: " << offset;
             item->paint(painter, offset, scale, extColor);
         }
     }

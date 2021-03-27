@@ -17,8 +17,8 @@ public:
     void moveTo(const double x, const double y) override;
     double getYbyX(double x) const;
     double getXbyY(double y) const;
-    const QPointF& getFirstPoint() const;
-    const QPointF& getSecondPoint() const;
+    const QPointF getFirstPoint() const;
+    const QPointF getSecondPoint() const;
 
     void write(QJsonObject &json) const override;
     void read(const QJsonObject &json) override;
@@ -27,8 +27,9 @@ public:
 
 private:
     QColor  _fillStyle;
-    QPointF _firstPoint;
-    QPointF _secondPoint;
+//    QPointF _firstPoint;
+//    QPointF _secondPoint;
+    QLineF _line;
     int8_t  _width;
 };
 

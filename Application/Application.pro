@@ -16,7 +16,10 @@ SOURCES += \
         src/DataBase/commondatabase.cpp \
         src/DataBase/connectionmanager.cpp \
         src/GraphicScene/PathFinder/customqueue.cpp \
+        src/GraphicScene/PathFinder/graphmanager.cpp \
         src/GraphicScene/PathFinder/listgraph.cpp \
+        src/GraphicScene/PathFinder/logicline.cpp \
+        src/GraphicScene/PathFinder/logicpoint.cpp \
         src/GraphicScene/PathFinder/pathfinder.cpp \
         src/GraphicScene/graphiccontainer.cpp \
         src/GraphicScene/Items/graphicimage.cpp \
@@ -53,8 +56,11 @@ HEADERS += \
     include/DataBase/connectionmanager.h \
     include/DataBase/dbtypes.h \
     include/GraphicScene/PathFinder/customqueue.h \
+    include/GraphicScene/PathFinder/graphmanager.h \
     include/GraphicScene/PathFinder/graphtypes.h \
     include/GraphicScene/PathFinder/listgraph.h \
+    include/GraphicScene/PathFinder/logicline.h \
+    include/GraphicScene/PathFinder/logicpoint.h \
     include/GraphicScene/PathFinder/pathfinder.h \
     include/GraphicScene/graphicconstructor.h \
     include/GraphicScene/graphiccontainer.h \
@@ -69,7 +75,8 @@ HEADERS += \
     include/MapFileModel/mapfile.h \
     include/MapFileModel/mapfilemodel.h \
     include/MapFileModel/mapfilereader.h \
-    include/MapFloorsModel/mapfloorsmodel.h
+    include/MapFloorsModel/mapfloorsmodel.h \
+    src/GraphicScene/PathFinder/logicline.h
 
 DISTFILES += \
     dependencies.pri
