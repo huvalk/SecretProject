@@ -10,12 +10,33 @@
 
 class GraphManager
 {
-    class CmpLine
+    class AngleComparator
     {
+        QPointF origin_;
+        QPointF dreference_;
+
+        static double IsSamePoint( QPointF a, QPointF b ) { return a.x() * b.y() - a.y() * b.x(); }
     public:
-        bool operator() ( const QLineF & left, const QLineF & right ) const
+        AngleComparator( const QPointF origin, const QPointF reference ) : origin_( origin ), dreference_( reference - origin ) {}
+        bool operator()( const QPointF a, const QPointF b ) const
         {
-            return left.p1().x() > right.p1().x() && left.p1().y() > right.p1().y() && left.p2().x() > right.p2().x() && left.p2().y() > right.p2().y();
+            const QPointF da = a - origin_, db = b - origin_;
+            const double detb = IsSamePoint( dreference_, db );
+
+            if ( detb == 0 && db.x() * dreference_.x() + db.y() * dreference_.y() >= 0 )
+                return false;
+
+            const double deta = IsSamePoint( dreference_, da );
+
+            if ( deta == 0 && da.x() * dreference_.x() + da.y() * dreference_.y() >= 0 )
+                return true;
+
+            if ( deta * detb >= 0 )
+            {
+                return IsSamePoint( da, db ) > 0;
+            }
+
+            return deta > 0;
         }
     };
     class CmpPoint
@@ -36,6 +57,7 @@ public:
 
 private:
     void findFloorPivotes(const int &floor);
+    void findPivotesFromPoint(std::vector<QPointF> &vector, const QPointF &from);
     void repopulateFloor(const int &floor);
 //    void findPathsFromPointOnFloor(const GraphTypes::logicFloor<QLineF> &walls, const int &floor);
 

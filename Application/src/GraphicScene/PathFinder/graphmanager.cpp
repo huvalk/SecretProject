@@ -51,51 +51,52 @@ void GraphManager::findFloorPivotes(const int &floor)
         return;
     }
 
-    for (auto from = currentFloorPivots->second.begin(); from != currentFloorPivots->second.end(); from++)
+    for (const auto &line: currentFloorWalls->second)
     {
-        auto tempFrom = from;
-        for (auto to = ++tempFrom; to != _pivots[floor].end(); to++)
+        auto p11  = line->p1();
+        auto p12 = line->p2();
+        auto pointsArray1 = std::vector<QPointF>{};
+        auto pointsArray2 = std::vector<QPointF>{};
+        for (const auto &line: currentFloorWalls->second)
         {
-            auto newPath = QLineF(from->get()->x(), from->get()->y(), to->get()->x(), to->get()->y());
-            auto tempPath = QLineF(newPath);
-            auto pathCenter = tempPath.center();
-            auto c = tempPath.length();
-            auto cos = (tempPath.p1().x() - tempPath.p2().x()) / c;
-            auto sin = (tempPath.p1().y() - tempPath.p2().y()) / c;
-            c = c / 2 - 1;
-            tempPath.setP1(QPointF(
-                               (pathCenter.x() - cos * c), (pathCenter.y() - sin * c)
-                               ));
-            tempPath.setP2(QPointF(
-                               (pathCenter.x() + cos * c), (pathCenter.y() + sin * c)
-                               ));
-
-            bool success = true;
-            for (const auto &line: _walls[floor])
+            auto p21  = line->p1();
+            auto p22 = line->p2();
+            if (p11 == p21)
             {
-                auto intersectes = line->intersect(tempPath, nullptr);
-                if (intersectes == QLineF::BoundedIntersection)
-                {
-                    success = false;
-                    break;
-                }
+                pointsArray1.push_back(p21);
             }
-
-            if (success)
+            if (p12 == p21)
             {
-                newFloorPivots.insert(std::make_shared<QPointF>(tempPath.p1()));
-                newFloorPivots.insert(std::make_shared<QPointF>(tempPath.p2()));
-                newFloorPivots.insert(std::make_shared<QPointF>(
-                                          pathCenter.x() - sin * 5, pathCenter.y() + cos* 5
-                                          ));
-                newFloorPivots.insert(std::make_shared<QPointF>(
-                                          pathCenter.x() + sin * 5, pathCenter.y() - cos* 5
-                                                                ));
+                pointsArray2.push_back(p21);
+            }
+            if (p11 == p22)
+            {
+                pointsArray1.push_back(p22);
+            }
+            if (p12 == p22)
+            {
+                pointsArray2.push_back(p22);
             }
         }
+
+        findPivotesFromPoint(pointsArray1, p11);
+        findPivotesFromPoint(pointsArray2, p12);
     }
 
     _pivots[floor] = newFloorPivots;
+}
+
+void GraphManager::findPivotesFromPoint(std::vector<QPointF> &vector, const QPointF &from)
+{
+    if (vector.size() == 0)
+    {
+        return;
+    }
+
+    std::sort( vector.begin(), vector.end(), AngleComparator(from, vector[0]) );
+    vector.push_back(vector[0]);
+
+
 }
 
 void GraphManager::repopulateFloor(const int &floor)
