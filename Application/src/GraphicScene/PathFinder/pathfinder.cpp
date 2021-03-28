@@ -1,18 +1,18 @@
 #include "GraphicScene/PathFinder/pathfinder.h"
 #include "GraphicScene/PathFinder/customqueue.h"
 #include <limits>
+#include <unordered_map>
 
 
 std::vector<GraphTypes::Node> Path( const ListGraph &graph, const GraphTypes::Node &begin, const GraphTypes::Node &end )
 {
-    const double INF = std::numeric_limits< double >::max();
     // вектор с расстояниями
-    std::vector< double > dist( graph.VerticesCount(), INF) ;
-    std::vector< GraphTypes::Node > path( graph.VerticesCount(), -1) ;
+    std::unordered_map< GraphTypes::Node, double > dist( graph.VerticesCount()) ;
+    std::unordered_map< GraphTypes::Node, GraphTypes::Node > path( graph.VerticesCount()) ;
     CustomQueue q;
     // начало поиска
     q.push( std::make_pair( begin, 0 ) );
-    dist[ static_cast<size_t>(begin) ] = 0;
+    dist[ begin ] = 0;
 
     // пока обход не выполнен
     while( ! q.empty() )
@@ -22,17 +22,19 @@ std::vector<GraphTypes::Node> Path( const ListGraph &graph, const GraphTypes::No
         for( auto & next : graph.GetNextVertices( current ) )
         {
             GraphTypes::Node next_node = next.first;
-            if ( dist[ static_cast<size_t>(next_node) ] > (INF - 1) ) // если нода еще не посещена
+            auto nextNodeDist = dist.find(next_node);
+            auto currentNodeDist = dist.find(current);
+            if (nextNodeDist == dist.end()) // если нода еще не посещена
             {
-                dist[ static_cast<size_t>(next_node) ] = dist[ static_cast<size_t>(current) ] + next.second;
+                dist[ next_node ] = currentNodeDist->second + next.second;
                 q.push( std::make_pair( next_node, next.second ) );
             }
-            else if( dist[ static_cast<size_t>(next_node) ] > dist[ static_cast<size_t>(current) ] + next.second ) // если найден путь короче
+            else if( nextNodeDist->second > currentNodeDist->second + next.second ) // если найден путь короче
             {
-                path[static_cast<size_t>(next_node)] = current;
-                dist[ static_cast<size_t>(next_node) ] = dist[ static_cast<size_t>(current) ] + next.second;
+                path[next_node] = current;
+                dist[ next_node ] = dist[ current ] + next.second;
                 // изменить приоритет соединения
-                q.decrease( next_node, dist[ static_cast<size_t>(next_node) ] );
+                q.decrease( next_node, dist[ next_node ] );
             }
         }
     }
@@ -41,12 +43,13 @@ std::vector<GraphTypes::Node> Path( const ListGraph &graph, const GraphTypes::No
     GraphTypes::Node start = begin;
     for (; start != end;)
     {
-        if (start == -1)
+        resultPath.push_back(start);
+        auto it = path.find(start);
+        if (it == path.end())
         {
             return std::vector<GraphTypes::Node>{};
         }
-        resultPath.push_back(start);
-        start = path[static_cast<size_t>(start)];
+        start = it->second;
     }
     resultPath.push_back(start);
     return resultPath;
