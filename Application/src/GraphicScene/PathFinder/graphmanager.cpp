@@ -1,4 +1,7 @@
 #include <GraphicScene/PathFinder/graphmanager.h>
+#include <GraphicScene/PathFinder/pathfinder.h>
+#include <math.h>
+#include <QDebug>
 
 GraphManager::GraphManager(const GraphicTypes::building<GraphicLine> &walls, const GraphicTypes::building<GraphicPoint> &ladders)
 {
@@ -10,6 +13,17 @@ void GraphManager::findPath(const GraphicPoint &from, const GraphicPoint &to)
 
 }
 
+void GraphManager::findPath()
+{
+    const auto result = Path(_graph, 0, static_cast<GraphTypes::Node>(_graph.VerticesCount()) - 1);
+
+    int i = 0;
+    for (; i + 1 < static_cast<int>(result.size()); ++i)
+    {
+        paths.push_back(GraphicLine(_nodeToPivot[i], _nodeToPivot[i+1]));
+    }
+}
+
 void GraphManager::repopulateGraph(const GraphicTypes::building<GraphicLine> &walls, const GraphicTypes::building<GraphicPoint> &ladders)
 {
     auto result = std::vector<GraphicLine>{};
@@ -17,85 +31,87 @@ void GraphManager::repopulateGraph(const GraphicTypes::building<GraphicLine> &wa
     for (auto floor: walls)
     {
         auto z = floorHeight * floor.first;
-        auto floorPivots = GraphicTypes::floor<QPointF>{};
         auto floorWalls = GraphicTypes::floor<QLineF>{};
 
         for (auto item: floor.second)
         {
             auto line = item->getLine();
-//            _walls[floor.first].insert(std::make_shared<QLineF>(line));
+
             floorWalls.insert(std::make_shared<QLineF>(line));
-            floorPivots.insert(std::make_shared<QPointF>(line.p1()));
-            floorPivots.insert(std::make_shared<QPointF>(line.p2()));
+            findLinePivotes(line, floor.first);
         }
         _walls[floor.first] = floorWalls;
-        // TODO разделять поворотные точки
-        _pivots[floor.first] = floorPivots;
 
-        findFloorPivotes(floor.first);
         repopulateFloor(floor.first);
     }
 }
 
-void GraphManager::findFloorPivotes(const int &floor)
+void GraphManager::findLinePivotes(const QLineF &line, const int &floor)
 {
-    auto currentFloorWalls = _walls.find(floor);
-    auto newFloorPivots = GraphicTypes::floor<QPointF>{};
-    if (currentFloorWalls == _walls.end())
+    auto newFloorPivots = _pivots.find(floor);
+    if (newFloorPivots == _pivots.end())
     {
-        return;
-    }
-    auto currentFloorPivots = _pivots.find(floor);
-    if (currentFloorPivots == _pivots.end())
-    {
-        return;
+        _pivots[floor] = GraphicTypes::floor<QPointF>{};
+        newFloorPivots = _pivots.find(floor);
     }
 
-    for (const auto &line: currentFloorWalls->second)
-    {
-        auto p11  = line->p1();
-        auto p12 = line->p2();
-        auto pointsArray1 = std::vector<QPointF>{};
-        auto pointsArray2 = std::vector<QPointF>{};
-        for (const auto &line: currentFloorWalls->second)
-        {
-            auto p21  = line->p1();
-            auto p22 = line->p2();
-            if (p11 == p21)
-            {
-                pointsArray1.push_back(p21);
-            }
-            if (p12 == p21)
-            {
-                pointsArray2.push_back(p21);
-            }
-            if (p11 == p22)
-            {
-                pointsArray1.push_back(p22);
-            }
-            if (p12 == p22)
-            {
-                pointsArray2.push_back(p22);
-            }
-        }
+    auto padding = 5;
+    auto p1  = line.p1();
+    auto p2 = line.p2();
+    auto pathCenter = line.center();
+    auto c = line.length();
+    auto cos = (p2.x() - p1.x()) / c;
+    auto sin = (p2.y() - p1.y()) / c;
 
-        findPivotesFromPoint(pointsArray1, p11);
-        findPivotesFromPoint(pointsArray2, p12);
-    }
+    auto centerPivot1 = QPointF(
+                (pathCenter.x() - sin * 15), (pathCenter.y() - cos * padding * 3)
+                );
+    auto centerPivot2 = QPointF(
+                (pathCenter.x() + sin * 15), (pathCenter.y() + cos * padding * 3)
+                );
+//    newFloorPivots.insert(std::make_shared<QPointF>(centerPivot1));
+//    newFloorPivots.insert(std::make_shared<QPointF>(centerPivot2));
 
-    _pivots[floor] = newFloorPivots;
+    auto c1 = std::hypot(centerPivot1.x() - p1.x(), centerPivot1.y() - p1.y());
+    auto c2 = std::hypot(centerPivot2.x() - p1.x(), centerPivot2.y() - p1.y());
+    auto cos1 = (centerPivot1.x() - p1.x()) / c1;
+    auto sin1 = (centerPivot1.y() - p1.y()) / c1;
+    auto cos2 = (centerPivot2.x() - p1.x()) / c2;
+    auto sin2 = (centerPivot2.y() - p1.y()) / c2;
+
+    auto dx1 = cos1 * padding;
+    auto dy1 = sin1 * padding;
+    auto dx2 = cos2 * padding;
+    auto dy2 = sin2 * padding;
+
+    auto newPivote = QPointF(p1.x() + dx1, p1.y() + dy1);
+    newFloorPivots->second.insert(std::make_shared<QPointF>(newPivote));
+    auto newId = static_cast<GraphTypes::Node>(_nodeToPivot.size());
+    _nodeToPivot[newId] = newPivote;
+    _pivotToNode[newPivote] = newId;
+
+
+    newPivote = QPointF(p1.x() + dx2, p1.y() + dy2);
+    newFloorPivots->second.insert(std::make_shared<QPointF>(newPivote));
+    newId = static_cast<GraphTypes::Node>(_nodeToPivot.size());
+    _nodeToPivot[newId] = newPivote;
+    _pivotToNode[newPivote] = newId;
+
+    newPivote = QPointF(p2.x() - dx1, p2.y() - dy1);
+    newFloorPivots->second.insert(std::make_shared<QPointF>(newPivote));
+    newId = static_cast<GraphTypes::Node>(_nodeToPivot.size());
+    _nodeToPivot[newId] = newPivote;
+    _pivotToNode[newPivote] = newId;
+
+    newPivote = QPointF(p2.x() - dx2, p2.y() - dy2);
+    newFloorPivots->second.insert(std::make_shared<QPointF>(newPivote));
+    newId = static_cast<GraphTypes::Node>(_nodeToPivot.size());
+    _nodeToPivot[newId] = newPivote;
+    _pivotToNode[newPivote] = newId;
 }
 
 void GraphManager::findPivotesFromPoint(std::vector<QPointF> &vector, const QPointF &from)
 {
-    if (vector.size() == 0)
-    {
-        return;
-    }
-
-    std::sort( vector.begin(), vector.end(), AngleComparator(from, vector[0]) );
-    vector.push_back(vector[0]);
-
 
 }
 
@@ -114,8 +130,9 @@ void GraphManager::repopulateFloor(const int &floor)
 
     for (auto from = currentFloorPivots->second.begin(); from != currentFloorPivots->second.end(); from++)
     {
-        auto tempFrom = from;
-        for (auto to = ++tempFrom; to != _pivots[floor].end(); to++)
+        auto curId = _pivotToNode[*from->get()];
+        auto startTo = from;
+        for (auto to = ++startTo; to != _pivots[floor].end(); to++)
         {
             auto newPath = QLineF(from->get()->x(), from->get()->y(), to->get()->x(), to->get()->y());
 
@@ -132,7 +149,14 @@ void GraphManager::repopulateFloor(const int &floor)
 
             if (success)
             {
-                paths.push_back(GraphicLine(newPath.p1(), newPath.p2()));
+                auto a = *to;
+                auto r = _pivotToNode.find(*to->get());
+                if (r == _pivotToNode.end())
+                {
+                    qDebug() << "err";
+                }
+
+                _graph.AddEdge(curId, _pivotToNode[*to->get()], newPath.length());
             }
         }
     }

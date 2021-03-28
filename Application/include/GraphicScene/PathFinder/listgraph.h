@@ -6,7 +6,7 @@
 
 struct ListGraph
 {
-    ListGraph( int count );
+    ListGraph();
     ~ListGraph() = default;
     // Добавление ребра от from к to.
     void AddEdge(const GraphTypes::Node &from, const GraphTypes::Node &to, const double &time = 0);

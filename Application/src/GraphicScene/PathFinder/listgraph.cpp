@@ -1,6 +1,6 @@
 #include "GraphicScene/PathFinder/listgraph.h"
 
-ListGraph::ListGraph( int count )
+ListGraph::ListGraph( )
 {
 }
 
@@ -35,9 +35,9 @@ std::vector< GraphTypes::Edge > ListGraph::GetNextVertices( const GraphTypes::No
 
 std::vector< GraphTypes::Edge > ListGraph::GetPrevVertices( const GraphTypes::Node &vertex ) const
 {
-    auto prev = vert_out_.find(vertex);
+    auto prev = vert_in_.find(vertex);
 
-    if (prev != vert_out_.end())
+    if (prev != vert_in_.end())
     {
         return prev->second;
     } else

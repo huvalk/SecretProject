@@ -7,7 +7,7 @@
 
 namespace GraphTypes
 {
-using Node = uint64_t;
+using Node = int64_t;
 
 using Edge = std::pair< Node, double >;
 

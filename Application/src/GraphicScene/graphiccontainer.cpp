@@ -234,6 +234,7 @@ GraphicTypes::building<GraphicLine>::iterator GraphicContainer::endLines()
 QString GraphicContainer::generateJSONScene()
 {
     auto grap = std::make_shared<GraphManager>(_lines, _points);
+    grap->findPath();
     for (const auto &item: grap->paths)
     {
         _lines[-1].insert(std::make_shared<GraphicLine>(item));

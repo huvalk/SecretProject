@@ -5,6 +5,7 @@
 #include <GraphicScene/Items/graphicpoint.h>
 #include <GraphicScene/PathFinder/logicline.h>
 #include <GraphicScene/PathFinder/graphtypes.h>
+#include <GraphicScene/PathFinder/listgraph.h>
 #include <GraphicScene/graphictypes.h>
 #include <map>
 
@@ -44,19 +45,21 @@ class GraphManager
     public:
         bool operator() ( const QPointF & left, const QPointF & right ) const
         {
-            return left.x() > right.x() && left.y() > right.y();
+            return left.x() < right.x() || ((abs(right.x() - left.x()) < std::numeric_limits<double>::epsilon()) && left.y() < right.y());
         }
     };
 
 public:
-    GraphManager() = default;
+    GraphManager();
     GraphManager(const GraphicTypes::building<GraphicLine> &walls, const GraphicTypes::building<GraphicPoint> &ladders);
     void repopulateGraph(const GraphicTypes::building<GraphicLine> &walls, const GraphicTypes::building<GraphicPoint> &ladders);
     void findPath(const GraphicPoint &from, const GraphicPoint &to);
+    void findPath();
     std::vector<GraphicLine> paths;
 
+
 private:
-    void findFloorPivotes(const int &floor);
+    void findLinePivotes(const QLineF &line, const int &floor);
     void findPivotesFromPoint(std::vector<QPointF> &vector, const QPointF &from);
     void repopulateFloor(const int &floor);
 //    void findPathsFromPointOnFloor(const GraphTypes::logicFloor<QLineF> &walls, const int &floor);
@@ -65,4 +68,5 @@ private:
     GraphicTypes::building<QPointF> _pivots;
     std::map<QPointF, GraphTypes::Node, CmpPoint> _pivotToNode;
     std::map<GraphTypes::Node, QPointF> _nodeToPivot;
+    ListGraph _graph;
 };
