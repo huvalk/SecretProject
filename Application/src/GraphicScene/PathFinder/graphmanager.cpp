@@ -32,13 +32,15 @@ void GraphManager::repopulateGraph(const GraphicTypes::building<GraphicLine> &wa
         // TODO разделять поворотные точки
         _pivots[floor.first] = floorPivots;
 
+        findFloorPivotes(floor.first);
         repopulateFloor(floor.first);
     }
 }
 
-void GraphManager::repopulateFloor(const int &floor)
+void GraphManager::findFloorPivotes(const int &floor)
 {
     auto currentFloorWalls = _walls.find(floor);
+    auto newFloorPivots = GraphicTypes::floor<QPointF>{};
     if (currentFloorWalls == _walls.end())
     {
         return;
@@ -54,12 +56,13 @@ void GraphManager::repopulateFloor(const int &floor)
         auto tempFrom = from;
         for (auto to = ++tempFrom; to != _pivots[floor].end(); to++)
         {
-            auto tempPath = QLineF(from->get()->x(), from->get()->y(), to->get()->x(), to->get()->y());
+            auto newPath = QLineF(from->get()->x(), from->get()->y(), to->get()->x(), to->get()->y());
+            auto tempPath = QLineF(newPath);
             auto pathCenter = tempPath.center();
             auto c = tempPath.length();
             auto cos = (tempPath.p1().x() - tempPath.p2().x()) / c;
             auto sin = (tempPath.p1().y() - tempPath.p2().y()) / c;
-            c = c / 2 - 5;
+            c = c / 2 - 1;
             tempPath.setP1(QPointF(
                                (pathCenter.x() - cos * c), (pathCenter.y() - sin * c)
                                ));
@@ -80,7 +83,55 @@ void GraphManager::repopulateFloor(const int &floor)
 
             if (success)
             {
-                paths.push_back(GraphicLine(tempPath.p1(), tempPath.p2()));
+                newFloorPivots.insert(std::make_shared<QPointF>(tempPath.p1()));
+                newFloorPivots.insert(std::make_shared<QPointF>(tempPath.p2()));
+                newFloorPivots.insert(std::make_shared<QPointF>(
+                                          pathCenter.x() - sin * 5, pathCenter.y() + cos* 5
+                                          ));
+                newFloorPivots.insert(std::make_shared<QPointF>(
+                                          pathCenter.x() + sin * 5, pathCenter.y() - cos* 5
+                                                                ));
+            }
+        }
+    }
+
+    _pivots[floor] = newFloorPivots;
+}
+
+void GraphManager::repopulateFloor(const int &floor)
+{
+    auto currentFloorWalls = _walls.find(floor);
+    if (currentFloorWalls == _walls.end())
+    {
+        return;
+    }
+    auto currentFloorPivots = _pivots.find(floor);
+    if (currentFloorPivots == _pivots.end())
+    {
+        return;
+    }
+
+    for (auto from = currentFloorPivots->second.begin(); from != currentFloorPivots->second.end(); from++)
+    {
+        auto tempFrom = from;
+        for (auto to = ++tempFrom; to != _pivots[floor].end(); to++)
+        {
+            auto newPath = QLineF(from->get()->x(), from->get()->y(), to->get()->x(), to->get()->y());
+
+            bool success = true;
+            for (const auto &line: _walls[floor])
+            {
+                auto intersectes = line->intersect(newPath, nullptr);
+                if (intersectes == QLineF::BoundedIntersection)
+                {
+                    success = false;
+                    break;
+                }
+            }
+
+            if (success)
+            {
+                paths.push_back(GraphicLine(newPath.p1(), newPath.p2()));
             }
         }
     }

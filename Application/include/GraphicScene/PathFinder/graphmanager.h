@@ -35,6 +35,7 @@ public:
     std::vector<GraphicLine> paths;
 
 private:
+    void findFloorPivotes(const int &floor);
     void repopulateFloor(const int &floor);
 //    void findPathsFromPointOnFloor(const GraphTypes::logicFloor<QLineF> &walls, const int &floor);
 
