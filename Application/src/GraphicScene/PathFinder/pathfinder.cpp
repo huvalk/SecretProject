@@ -12,36 +12,35 @@ std::vector<GraphTypes::Node> Path( const ListGraph &graph, const GraphTypes::No
     CustomQueue q;
     // начало поиска
     q.push( std::make_pair( begin, 0 ) );
+    path[ begin ] = begin;
     dist[ begin ] = 0;
 
     // пока обход не выполнен
     while( ! q.empty() )
     {
         GraphTypes::Node current = q.top().first;
+        if (current == end)
+        {
+            break;
+        }
+
         q.pop();
         for( auto & next : graph.GetNextVertices( current ) )
         {
+            double new_cost = dist[ current ] + next.second;
             GraphTypes::Node next_node = next.first;
-            auto nextNodeDist = dist.find(next_node);
-            auto currentNodeDist = dist.find(current);
-            if (nextNodeDist == dist.end()) // если нода еще не посещена
-            {
-                dist[ next_node ] = currentNodeDist->second + next.second;
-                q.push( std::make_pair( next_node, next.second ) );
-            }
-            else if( nextNodeDist->second > currentNodeDist->second + next.second ) // если найден путь короче
-            {
-                path[next_node] = current;
-                dist[ next_node ] = dist[ current ] + next.second;
-                // изменить приоритет соединения
-                q.decrease( next_node, dist[ next_node ] );
+
+            if (!dist.count(next_node) || new_cost < dist[next_node]) {
+              dist[next_node] = new_cost;
+              q.push(std::make_pair(next_node, new_cost));
+              path[next_node] = current;
             }
         }
     }
 
     auto resultPath = std::vector< GraphTypes::Node >{};
-    GraphTypes::Node start = begin;
-    for (; start != end;)
+    GraphTypes::Node start = end;
+    for (; start != begin;)
     {
         resultPath.push_back(start);
         auto it = path.find(start);

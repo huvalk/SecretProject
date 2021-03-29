@@ -17,10 +17,10 @@ void GraphManager::findPath()
 {
     const auto result = Path(_graph, 0, static_cast<GraphTypes::Node>(_graph.VerticesCount()) - 1);
 
-    int i = 0;
-    for (; i + 1 < static_cast<int>(result.size()); ++i)
+    size_t i = 0;
+    for (; i + 1 <  result.size(); ++i)
     {
-        paths.push_back(GraphicLine(_nodeToPivot[i], _nodeToPivot[i+1]));
+        paths.push_back(GraphicLine(_nodeToPivot[result[i]], _nodeToPivot[result[i+1]]));
     }
 }
 
