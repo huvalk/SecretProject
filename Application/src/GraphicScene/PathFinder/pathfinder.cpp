@@ -6,6 +6,7 @@
 
 std::vector<GraphTypes::Node> Path( const ListGraph &graph, const GraphTypes::Node &begin, const GraphTypes::Node &end )
 {
+    // TODO A*
     // вектор с расстояниями
     std::unordered_map< GraphTypes::Node, double > dist( graph.VerticesCount()) ;
     std::unordered_map< GraphTypes::Node, GraphTypes::Node > path( graph.VerticesCount()) ;

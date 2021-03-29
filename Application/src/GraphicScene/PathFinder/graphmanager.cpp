@@ -1,5 +1,6 @@
 #include <GraphicScene/PathFinder/graphmanager.h>
 #include <GraphicScene/PathFinder/pathfinder.h>
+#include <GraphicScene/Items/graphicpoint.h>
 #include <math.h>
 #include <QDebug>
 
@@ -8,15 +9,82 @@ GraphManager::GraphManager(const GraphicTypes::building<GraphicLine> &walls, con
     repopulateGraph(walls, ladders);
 }
 
-void GraphManager::findPath(const GraphicPoint &from, const GraphicPoint &to)
+void GraphManager::findPath(GraphicPoint &from, GraphicPoint &to, const int &fromFloor, const int &toFloor)
 {
+    auto firstId = static_cast<GraphTypes::Node>(_nodeToPivot.size());
+    auto secondId = firstId + 1;
+    // Первый этаж
+    for (const auto & toPivote: _pivots[fromFloor])
+    {
+        auto newPath = QLineF(from.pos(), *toPivote);
 
-}
+        bool success = true;
+        for (const auto &line: _walls[fromFloor])
+        {
+            auto intersectes = line->intersect(newPath, nullptr);
+            if (intersectes == QLineF::BoundedIntersection)
+            {
+                success = false;
+                break;
+            }
+        }
 
-void GraphManager::findPath()
-{
+        if (success)
+        {
+            _graph.AddEdge(firstId, _pivotToNode[*toPivote], newPath.length());
+        }
+    }
+    // Второй этаж
+    for (const auto & toPivote: _pivots[toFloor])
+    {
+        auto newPath = QLineF(to.pos(), *toPivote);
+
+        bool success = true;
+        for (const auto &line: _walls[toFloor])
+        {
+            auto intersectes = line->intersect(newPath, nullptr);
+            if (intersectes == QLineF::BoundedIntersection)
+            {
+                success = false;
+                break;
+            }
+        }
+
+        if (success)
+        {
+            _graph.AddEdge(secondId, _pivotToNode[*toPivote], newPath.length());
+        }
+    }
+    // Между точками напрямую
+    auto newPath = QLineF(to.pos(), from.pos());
+
+    bool success = true;
+    for (const auto &line: _walls[toFloor])
+    {
+        auto intersectes = line->intersect(newPath, nullptr);
+        if (intersectes == QLineF::BoundedIntersection)
+        {
+            success = false;
+            break;
+        }
+    }
+
+    if (success)
+    {
+        _graph.AddEdge(secondId, firstId, newPath.length());
+    }
+
+    _pivots[fromFloor].insert(std::make_shared<QPointF>(from.pos()));
+    // TODO брать позицию точки начала и конца, достраивать линии на этажах
+    // TODO временное хранилище для достроенныхлиний
+    _nodeToPivot[firstId] = from.pos();
+    _pivotToNode[from.pos()] = firstId;
+
+    _pivots[toFloor].insert(std::make_shared<QPointF>(to.pos()));
+    _nodeToPivot[secondId] = to.pos();
+    _pivotToNode[to.pos()] = secondId;
+
     const auto result = Path(_graph, 0, static_cast<GraphTypes::Node>(_graph.VerticesCount()) - 1);
-
     size_t i = 0;
     for (; i + 1 <  result.size(); ++i)
     {
@@ -48,6 +116,7 @@ void GraphManager::repopulateGraph(const GraphicTypes::building<GraphicLine> &wa
 
 void GraphManager::findLinePivotes(const QLineF &line, const int &floor)
 {
+    // TODO сортировать по углу и находить биссектрису угла
     auto newFloorPivots = _pivots.find(floor);
     if (newFloorPivots == _pivots.end())
     {
@@ -108,6 +177,52 @@ void GraphManager::findLinePivotes(const QLineF &line, const int &floor)
     newId = static_cast<GraphTypes::Node>(_nodeToPivot.size());
     _nodeToPivot[newId] = newPivote;
     _pivotToNode[newPivote] = newId;
+}
+
+void GraphManager::findLadderPivotes(const GraphicTypes::building<GraphicPoint> &ladders)
+{
+    std::unordered_map<int, std::map<int, QPointF>> floorIdLadders;
+
+    for (const auto &floor: ladders)
+    {
+        for (const auto &ladder: floor.second)
+        {
+            floorIdLadders[ladder->getId()][floor.first] = ladder->pos();
+        }
+    }
+
+    auto floorHeight = 10;
+    for (const auto &id: floorIdLadders)
+    {
+        auto ladderFrom = id.second.begin();
+        if (ladderFrom == id.second.end())
+        {
+            continue;
+        }
+        auto ladderTo = ladderFrom;
+        ladderTo++;
+        auto z1 = ladderFrom->first * floorHeight;
+        for (; ladderTo != id.second.end(); ladderTo++)
+        {
+            _pivots[ladderFrom->first].insert(std::make_shared<QPointF>(ladderFrom->second));
+            auto firstId = static_cast<GraphTypes::Node>(_nodeToPivot.size());
+            _nodeToPivot[firstId] = ladderFrom->second;
+            _pivotToNode[ladderFrom->second] = firstId;
+
+            _pivots[ladderTo->first].insert(std::make_shared<QPointF>(ladderTo->second));
+            auto secondId = static_cast<GraphTypes::Node>(_nodeToPivot.size());
+            _nodeToPivot[secondId] = ladderTo->second;
+            _pivotToNode[ladderTo->second] = secondId;
+
+            auto z2 = ladderTo->first * floorHeight;
+            auto length = std::hypot(ladderFrom->second.x() - ladderTo->second.x(),
+                                     ladderFrom->second.y() - ladderTo->second.y(),
+                                     z2 - z1
+                                     );
+
+            _graph.AddEdge(firstId, secondId, length);
+        }
+    }
 }
 
 void GraphManager::findPivotesFromPoint(std::vector<QPointF> &vector, const QPointF &from)

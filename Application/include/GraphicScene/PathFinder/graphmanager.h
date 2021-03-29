@@ -53,13 +53,14 @@ public:
     GraphManager();
     GraphManager(const GraphicTypes::building<GraphicLine> &walls, const GraphicTypes::building<GraphicPoint> &ladders);
     void repopulateGraph(const GraphicTypes::building<GraphicLine> &walls, const GraphicTypes::building<GraphicPoint> &ladders);
-    void findPath(const GraphicPoint &from, const GraphicPoint &to);
+    void findPath(GraphicPoint &from, GraphicPoint &to, const int &fromFloor, const int &toFloor);
     void findPath();
     std::vector<GraphicLine> paths;
 
 
 private:
     void findLinePivotes(const QLineF &line, const int &floor);
+    void findLadderPivotes(const GraphicTypes::building<GraphicPoint> &ladders);
     void findPivotesFromPoint(std::vector<QPointF> &vector, const QPointF &from);
     void repopulateFloor(const int &floor);
 //    void findPathsFromPointOnFloor(const GraphTypes::logicFloor<QLineF> &walls, const int &floor);
