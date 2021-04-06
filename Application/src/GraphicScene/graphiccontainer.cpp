@@ -13,6 +13,22 @@ GraphicContainer::GraphicContainer()
 
 }
 
+void GraphicContainer::paintPath(const int floor, const uint8_t scale, const QPointF& offset, const  QRectF& area, QPainter* painter, const bool bg) const
+{
+    // TODO отрисовывать точки и путь
+    auto currentFloorLines = _path.find(floor);
+    if (currentFloorLines != _path.end())
+    {
+        for (auto item: currentFloorLines->second)
+        {
+            if (item->redrawRequest(area))
+            {
+                item->paint(painter, offset, scale, bg);
+            }
+        }
+    }
+}
+
 void GraphicContainer::paintLines(const int floor, const uint8_t scale, const QPointF& offset, const  QRectF& area, QPainter* painter, const bool bg) const
 {
     auto currentFloorLines = _lines.find(floor);
@@ -137,6 +153,16 @@ std::shared_ptr<GraphicLine> GraphicContainer::findLine(const int floor, const Q
     return nullptr;
 }
 
+QRectF GraphicContainer::addFrom(const int floor, const QPointF &pos)
+{
+    _fromToPoints[0] = std::make_pair(floor, std::make_shared<QPointF>(pos));
+}
+
+QRectF GraphicContainer::addTo(const int floor, const QPointF &pos)
+{
+    _fromToPoints[1] = std::make_pair(floor, std::make_shared<QPointF>(pos));
+}
+
 QRectF GraphicContainer::addPoint(const int floor, const QPointF &pos)
 {
     auto tempPoint = findPoint(floor, pos);
@@ -233,12 +259,6 @@ GraphicTypes::building<GraphicLine>::iterator GraphicContainer::endLines()
 
 QString GraphicContainer::generateJSONScene()
 {
-    auto grap = std::make_shared<GraphManager>(_lines, _points);
-//    grap->findPath();
-    for (const auto &item: grap->paths)
-    {
-        _lines[-1].insert(std::make_shared<GraphicLine>(item));
-    }
     return write();
 }
 
@@ -381,4 +401,18 @@ void GraphicContainer::read(QString json)
     } else {
         qWarning() << "Missing points";
     }
+}
+
+void GraphicContainer::findPath()
+{
+    auto grap = std::make_shared<GraphManager>(_lines, _points);
+    if (_fromToPoints[0].second == nullptr || _fromToPoints[1].second == nullptr)
+    {
+        return;
+    }
+
+    _path = grap->findPath(
+            std::make_pair(_fromToPoints[0].first, *_fromToPoints[0].second),
+            std::make_pair(_fromToPoints[1].first, *_fromToPoints[1].second)
+            );
 }

@@ -167,6 +167,14 @@ Column {
         }
     }
 
+    BaseText {
+        id: _createLadderText
+        width: parent.width
+        horizontalAlignment: Text.AlignHCenter
+        verticalAlignment: Text.AlignVCenter
+        text: "Лестницы"
+    }
+
     Row {
         EyeCheckBox {
             id: _createLadderBtn
@@ -199,6 +207,48 @@ Column {
 //                    canvas.setBackgroundFloor(floor)
 //                }
             }
+        }
+    }
+
+            BaseText {
+                id: _setTargetLabel
+                width: parent.width
+                horizontalAlignment: Text.AlignHCenter
+                verticalAlignment: Text.AlignVCenter
+                text: "Маршрут"
+            }
+
+    Row {
+        EyeCheckBox {
+            id: _setTargetBtn
+
+            trueIndicator: Resources.images.eyeOpened
+            falseIndicator: Resources.images.eyeClosed
+            onCheckedChanged: {
+                if (checked) {
+                    canvas.setEditingMod(5)
+                } else {
+                    canvas.setEditingMod(0)
+                }
+            }
+        }
+    }
+
+    DefaultButton {
+        // под размер картинки 96*47
+        id: _findPath
+        height: btnHeight
+        width: btnWidth
+
+        text: "Путь"
+        btnOverlayColor: _style.btnPrimaryColor
+        btnPrimaryColor: _style.btnSecondaryColor
+//        btnIconSource: Resources.images.browseFileIcon
+        btnShadow: _style.primaryOpacity
+        btnRadius: 0
+
+        onClicked: {
+            canvas.findPath()
         }
     }
 

@@ -48,6 +48,7 @@ public slots:
     void setBackgroundVisible(const bool is);
     void setBackgroundFloor(const int floor);
     void setBackgroundFloorVisible(const bool is);
+    void findPath();
 
 signals:
     void scaleChanged(const int scale);
@@ -62,6 +63,7 @@ private:
         CreateCamera,
         CreateLadder,
         CreateMark,
+        PlaceTarget,
         Nothing
     };
     enum CursorMod {

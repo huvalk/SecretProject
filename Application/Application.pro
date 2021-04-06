@@ -21,6 +21,7 @@ SOURCES += \
         src/GraphicScene/PathFinder/logicline.cpp \
         src/GraphicScene/PathFinder/logicpoint.cpp \
         src/GraphicScene/PathFinder/pathfinder.cpp \
+        src/GraphicScene/comparepoints.cpp \
         src/GraphicScene/graphiccontainer.cpp \
         src/GraphicScene/Items/graphicimage.cpp \
         src/GraphicScene/Items/graphicitem.cpp \
@@ -62,6 +63,7 @@ HEADERS += \
     include/GraphicScene/PathFinder/logicline.h \
     include/GraphicScene/PathFinder/logicpoint.h \
     include/GraphicScene/PathFinder/pathfinder.h \
+    include/GraphicScene/comparepoints.h \
     include/GraphicScene/graphicconstructor.h \
     include/GraphicScene/graphiccontainer.h \
     include/GraphicScene/Items/graphicimage.h \
@@ -75,8 +77,7 @@ HEADERS += \
     include/MapFileModel/mapfile.h \
     include/MapFileModel/mapfilemodel.h \
     include/MapFileModel/mapfilereader.h \
-    include/MapFloorsModel/mapfloorsmodel.h \
-    src/GraphicScene/PathFinder/logicline.h
+    include/MapFloorsModel/mapfloorsmodel.h
 
 DISTFILES += \
     dependencies.pri

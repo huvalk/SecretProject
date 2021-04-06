@@ -8,6 +8,7 @@
 #include <GraphicScene/PathFinder/listgraph.h>
 #include <GraphicScene/graphictypes.h>
 #include <map>
+#include "GraphicScene/comparepoints.h"
 
 class GraphManager
 {
@@ -40,22 +41,18 @@ class GraphManager
             return deta > 0;
         }
     };
-    class CmpPoint
-    {
-    public:
-        bool operator() ( const QPointF & left, const QPointF & right ) const
-        {
-            return left.x() < right.x() || ((abs(right.x() - left.x()) < std::numeric_limits<double>::epsilon()) && left.y() < right.y());
-        }
-    };
 
 public:
     GraphManager();
     GraphManager(const GraphicTypes::building<GraphicLine> &walls, const GraphicTypes::building<GraphicPoint> &ladders);
     void repopulateGraph(const GraphicTypes::building<GraphicLine> &walls, const GraphicTypes::building<GraphicPoint> &ladders);
-    void findPath(GraphicPoint &from, GraphicPoint &to, const int &fromFloor, const int &toFloor);
+    GraphicTypes::building<GraphicLine> findPath(std::pair<int, QPointF> from, std::pair<int, QPointF> to);
     void findPath();
-    std::vector<GraphicLine> paths;
+
+    QString write();
+    void read(QString json);
+
+    GraphicTypes::building<GraphicLine> resultLines;
 
 
 private:
@@ -67,7 +64,7 @@ private:
 
      GraphicTypes::building<QLineF> _walls;
     GraphicTypes::building<QPointF> _pivots;
-    std::map<QPointF, GraphTypes::Node, CmpPoint> _pivotToNode;
-    std::map<GraphTypes::Node, QPointF> _nodeToPivot;
+    std::map<std::pair<int, QPointF>, GraphTypes::Node> _pivotToNode;
+    std::map<GraphTypes::Node, std::pair<int, QPointF>> _nodeToPivot;
     ListGraph _graph;
 };

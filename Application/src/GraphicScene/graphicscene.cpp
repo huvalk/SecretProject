@@ -163,6 +163,11 @@ void GraphicScene::setFloor(const int floor)
     emit floorChanged(floor);
 }
 
+void GraphicScene::findPath()
+{
+    _container.findPath();
+}
+
 void GraphicScene::reset()
 {
     _dragPoint.setX(0);
@@ -436,6 +441,24 @@ void GraphicScene::mouseReleaseEvent(QMouseEvent *event)
         {
         case Qt::LeftButton:
             _container.addPoint(_floor, _cursorPoint->pos());
+            refresh = true;
+            break;
+
+        default:
+            break;
+        }
+        break;
+
+    case EditingMod::PlaceTarget:
+        switch (event->button())
+        {
+        case Qt::LeftButton:
+            _container.addFrom(_floor, event->pos());
+            refresh = true;
+            break;
+
+        case Qt::RightButton:
+            _container.addTo(_floor, event->pos());
             refresh = true;
             break;
 
