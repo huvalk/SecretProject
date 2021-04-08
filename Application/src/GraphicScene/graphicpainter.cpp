@@ -60,6 +60,9 @@ GraphicPainter::GraphicPainter()
     painter->setPen(QPen(QBrush("pink"), 1, Qt::SolidLine, Qt::RoundCap));
     painter->setBrush(QBrush("pink", Qt::SolidPattern));
     constructor.paintTemp(scale, offset, canvasWindow, painter, true);
+    painter->setPen(QPen(QBrush("purple"), 3, Qt::SolidLine, Qt::RoundCap));
+    painter->setBrush(QBrush("purple", Qt::SolidPattern));
+    container.paintPath(floor, scale, offset, canvasWindow, painter, true);
 
     if (!isDragging)
     {

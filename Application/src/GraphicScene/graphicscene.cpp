@@ -453,12 +453,12 @@ void GraphicScene::mouseReleaseEvent(QMouseEvent *event)
         switch (event->button())
         {
         case Qt::LeftButton:
-            _container.addFrom(_floor, event->pos());
+            _container.addFrom(_floor, _cursorPoint->pos());
             refresh = true;
             break;
 
         case Qt::RightButton:
-            _container.addTo(_floor, event->pos());
+            _container.addTo(_floor, _cursorPoint->pos());
             refresh = true;
             break;
 

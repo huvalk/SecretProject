@@ -27,6 +27,15 @@ void GraphicContainer::paintPath(const int floor, const uint8_t scale, const QPo
             }
         }
     }
+
+    if (_fromToPoints[0].second != nullptr && _fromToPoints[0].first == floor)
+    {
+        painter->drawEllipse((*_fromToPoints[0].second * scale - offset), _pointSize, _pointSize);
+    }
+    if (_fromToPoints[1].second != nullptr && _fromToPoints[1].first == floor)
+    {
+        painter->drawEllipse((*_fromToPoints[1].second * scale - offset), _pointSize, _pointSize);
+    }
 }
 
 void GraphicContainer::paintLines(const int floor, const uint8_t scale, const QPointF& offset, const  QRectF& area, QPainter* painter, const bool bg) const
