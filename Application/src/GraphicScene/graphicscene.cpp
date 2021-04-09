@@ -6,6 +6,9 @@
 #include <QSGSimpleTextureNode>
 #include <QImage>
 #include <QQuickWindow>
+#include <QJsonDocument>
+#include <QNetworkReply>
+#include <QJsonArray>
 
 GraphicScene::GraphicScene(QQuickItem *parent):
     QQuickPaintedItem(parent),
@@ -30,6 +33,9 @@ GraphicScene::GraphicScene(QQuickItem *parent):
     _backgroundFloorVisible(false),
     _ctrlPressed(false)
 {
+    QObject::connect(&_manager, SIGNAL(finished(QNetworkReply*)),
+        this, SLOT(managerFinished(QNetworkReply*)));
+
     _cursorPoint = std::make_shared<GraphicPoint>(0, 0, 5, 2, QColor("#A60000"), QColor("#FF9E00"));
 
     forceActiveFocus();
@@ -163,9 +169,53 @@ void GraphicScene::setFloor(const int floor)
     emit floorChanged(floor);
 }
 
+void GraphicScene::updateCameras()
+{
+    _request.setUrl(QUrl("http://localhost:9090/cameras"));
+    _manager.get(_request);
+}
+
 void GraphicScene::findPath()
 {
     _container.findPath();
+
+    update();
+}
+
+void GraphicScene::managerFinished(QNetworkReply *reply)
+{
+    if (reply->error())
+    {
+        qDebug() << reply->errorString();
+        return;
+    }
+
+    QString answer = reply->readAll();
+    QJsonDocument jsonDoc = QJsonDocument::fromJson(answer.toUtf8());
+    QJsonObject json = jsonDoc.object();
+    std::unordered_map<u_int64_t, u_int64_t> result = {};
+
+    if (json.contains("cameras") && json["cameras"].isArray())
+    {
+        QJsonArray cameras = json["cameras"].toArray();
+
+        for (auto const &camera: cameras) {
+            QJsonObject cameraJson = camera.toObject();
+
+            u_int64_t cameraID = 0;
+            u_int64_t people = 0;
+            cameraID = static_cast<u_int32_t>(cameraJson["cameraID"].toInt(0));
+            people = static_cast<u_int32_t>(cameraJson["people"].toInt(0));
+
+            result[cameraID] = people;
+        }
+    } else {
+        qWarning() << "No cameras in response";
+    }
+
+    _container.updateCameras(result);
+
+    update();
 }
 
 void GraphicScene::reset()

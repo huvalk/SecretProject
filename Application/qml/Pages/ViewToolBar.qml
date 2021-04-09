@@ -254,6 +254,24 @@ Column {
 
     DefaultButton {
         // под размер картинки 96*47
+        id: _updateCameras
+        height: btnHeight
+        width: btnWidth
+
+        text: "Обновить"
+        btnOverlayColor: _style.btnPrimaryColor
+        btnPrimaryColor: _style.btnSecondaryColor
+//        btnIconSource: Resources.images.browseFileIcon
+        btnShadow: _style.primaryOpacity
+        btnRadius: 0
+
+        onClicked: {
+            canvas.updateCameras()
+        }
+    }
+
+    DefaultButton {
+        // под размер картинки 96*47
         id: _upFloor
         height: btnHeight
         width: btnWidth

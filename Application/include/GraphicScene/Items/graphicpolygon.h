@@ -15,6 +15,7 @@ public:
     void paint(QPainter* painter, const QPointF& offset, const uint8_t scale, const bool extColor = false) override;
     void moveTo(const QPointF& offset) override;
     void moveTo(const double x, const double y) override;
+    bool setColor(const QColor &&changeArea);
     QPolygonF getPolygonPoints();
 
     void write(QJsonObject &json) const override;

@@ -132,7 +132,7 @@ void GraphManager::findLinePivotes(const QLineF &line, const int &floor)
         newFloorPivots = _pivots.find(floor);
     }
 
-    auto padding = 15;
+    auto padding = 10;
     int n = 8;
     auto p1  = line.p1();
     auto p2 = line.p2();

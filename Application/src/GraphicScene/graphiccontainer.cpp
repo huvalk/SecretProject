@@ -425,3 +425,20 @@ void GraphicContainer::findPath()
             std::make_pair(_fromToPoints[1].first, *_fromToPoints[1].second)
             );
 }
+
+void GraphicContainer::updateCameras(std::unordered_map<u_int64_t, u_int64_t> &cameras)
+{
+    for (auto const &floor: _polygons)
+    {
+        for (auto const &poly: floor.second)
+        {
+            auto curPeople = cameras[static_cast<u_int64_t>(poly->getId())];
+            if (curPeople > 1)
+            {
+                poly->setColor("orange");
+            } else {
+                poly->setColor("blue");
+            }
+        }
+    }
+}

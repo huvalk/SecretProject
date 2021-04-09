@@ -113,6 +113,7 @@ void GraphicPoint::read(const QJsonObject &json)
                   (_center.y() - _border - _radius),
                   (2 * (_border + _radius)),
                   (2 * (_border + _radius)));
+    _boundingRect.adjust(-1,-1,1,1);
 }
 
 GraphicPoint::~GraphicPoint()

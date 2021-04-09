@@ -17,6 +17,7 @@
 #include <QTime>
 #include <QTimer>
 #include <QSGGeometryNode>
+#include <QNetworkAccessManager>
 
 class GraphicScene : public QQuickPaintedItem
 {
@@ -49,6 +50,8 @@ public slots:
     void setBackgroundFloor(const int floor);
     void setBackgroundFloorVisible(const bool is);
     void findPath();
+    void updateCameras();
+    void managerFinished(QNetworkReply *reply) ;
 
 signals:
     void scaleChanged(const int scale);
@@ -71,6 +74,8 @@ private:
         MagniteToGrid,
         MagniteToWalls
     };
+    QNetworkAccessManager _manager;
+    QNetworkRequest _request;
     QRectF                         _canvasWindow;
     QRectF                         _changeArea;
     QPointF                        _offset;

@@ -5,7 +5,7 @@
 
 GraphicPolygon::GraphicPolygon(const QPolygonF &poly)
     : GraphicItem(poly.boundingRect().topLeft(), poly.boundingRect().bottomRight(), true),
-      _fillStyle("#1F75FE"),
+      _fillStyle("blue"),
       _poly(poly)
 {
 
@@ -123,6 +123,12 @@ void GraphicPolygon::read(const QJsonObject &json)
     }
 
     _boundingRect = QRectF(_poly.boundingRect().topLeft(), _poly.boundingRect().bottomRight());
+    _boundingRect.adjust(-1,-1,1,1);
+}
+
+bool GraphicPolygon::setColor(const QColor &&color)
+{
+    _fillStyle = color;
 }
 
 GraphicPolygon::~GraphicPolygon()

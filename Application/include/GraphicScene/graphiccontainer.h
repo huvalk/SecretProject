@@ -39,6 +39,7 @@ public:
     QString generateJSONScene();
     std::pair<bool, QVector<int>> parseJSONScene(QString json);
     void findPath();
+    void updateCameras(std::unordered_map<u_int64_t, u_int64_t> &cameras);
 
     QString write();
     void read(QString json);

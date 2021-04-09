@@ -20,6 +20,7 @@ QPointF GraphicLine::pos()
 
 bool GraphicLine::redrawRequest(const QRectF &changeArea)
 {
+    auto result =  _boundingRect.intersects(changeArea);
     return _boundingRect.intersects(changeArea);
 }
 
@@ -170,6 +171,7 @@ void GraphicLine::read(const QJsonObject &json)
     }
 
     _boundingRect = QRectF(_line.p1(), _line.p2()).normalized();
+    _boundingRect.adjust(-1,-1,1,1);
 }
 
 GraphicLine::~GraphicLine()
