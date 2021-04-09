@@ -23,11 +23,12 @@ public:
     std::pair<bool, QPointF>  lineAttachment(const int floor, const double startX, const double startY, const QPointF &pos);
     std::shared_ptr<GraphicPoint> findPoint(const int floor, const QPointF& pos);
     std::shared_ptr<GraphicLine> findLine(const int floor, const QPointF& pos);
+    std::shared_ptr<GraphicPolygon> findPoly(const int floor, const QPointF &pos);
     QRectF addFrom(const int floor, const QPointF &pos);
     QRectF addTo(const int floor, const QPointF &pos);
-    QRectF addPoint(const int floor, const QPointF &pos);
+    QRectF addPoint(const int floor, const QPointF &pos, const int &id = 0);
     QRectF  addLine(const int floor, const QLineF &line);
-    QRectF addPolygon(const int floor, const QPolygonF &poly);
+    QRectF addPolygon(const int floor, const QPolygonF &poly, const int &id = 0);
     std::pair<bool, QRectF>  deleteItem(const int floor, const QPointF &pos);
     bool clearPoints(const int floor);
     GraphicTypes::building<GraphicPoint>::iterator findPoints(const int floor);

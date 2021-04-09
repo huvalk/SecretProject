@@ -48,6 +48,8 @@ public slots:
     void setCursorMod(const int mod);
     void setBackgroundVisible(const bool is);
     void setBackgroundFloor(const int floor);
+    void setNewLadderID(const int id);
+    void setNewCameraID(const int id);
     void setBackgroundFloorVisible(const bool is);
     void findPath();
     void updateCameras();
@@ -88,6 +90,8 @@ private:
     double                          _canvasHeight;
     int                                _floor;
     int                                _backgroundFloor;
+    int                                _newLadderID;
+    int                                _newCameraID;
     int                                _editingMod;
     int                                _cursorMod;
     uint8_t                         _gridSize;

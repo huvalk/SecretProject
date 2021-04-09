@@ -21,6 +21,8 @@ GraphicScene::GraphicScene(QQuickItem *parent):
     _canvasHeight(),
     _floor(1),
     _backgroundFloor(1),
+    _newLadderID(0),
+    _newCameraID(0),
     _editingMod(EditingMod::CreateWalls),
     _cursorMod(CursorMod::MagniteToGrid),
     _gridSize(8),
@@ -138,6 +140,16 @@ void GraphicScene::setBackgroundFloor(const int floor)
     qDebug() << floor;
     _backgroundFloor = floor;
     update();
+}
+
+void GraphicScene::setNewLadderID(const int id)
+{
+    _newLadderID = id;
+}
+
+void GraphicScene::setNewCameraID(const int id)
+{
+    _newCameraID = id;
 }
 
 void GraphicScene::setBackgroundFloorVisible(const bool is)
@@ -468,7 +480,7 @@ void GraphicScene::mouseReleaseEvent(QMouseEvent *event)
                 _constructor.clearTemp();
                 if (newPoly.size() > 1)
                 {
-                    _container.addPolygon(_floor, newPoly);
+                    _container.addPolygon(_floor, newPoly, _newCameraID);
                 }
             }
         }
@@ -490,7 +502,7 @@ void GraphicScene::mouseReleaseEvent(QMouseEvent *event)
         switch (event->button())
         {
         case Qt::LeftButton:
-            _container.addPoint(_floor, _cursorPoint->pos());
+            _container.addPoint(_floor, _cursorPoint->pos(), _newLadderID);
             refresh = true;
             break;
 

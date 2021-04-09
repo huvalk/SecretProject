@@ -5,7 +5,7 @@
 
 GraphicPolygon::GraphicPolygon(const QPolygonF &poly)
     : GraphicItem(poly.boundingRect().topLeft(), poly.boundingRect().bottomRight(), true),
-      _fillStyle("blue"),
+      _fillStyle("green"),
       _poly(poly)
 {
 

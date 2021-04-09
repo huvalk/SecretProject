@@ -159,10 +159,10 @@ Column {
             placeholderText: "id"
 
             onTextChanged: {
-//                let floor = parseInt(text)
-//                if (!isNaN(floor)) {
-//                    canvas.setBackgroundFloor(floor)
-//                }
+                let id = parseInt(text)
+                if (!isNaN(id)) {
+                    canvas.setNewCameraID(id)
+                }
             }
         }
     }
@@ -202,10 +202,10 @@ Column {
             placeholderText: "id"
 
             onTextChanged: {
-//                let floor = parseInt(text)
-//                if (!isNaN(floor)) {
-//                    canvas.setBackgroundFloor(floor)
-//                }
+                let id = parseInt(text)
+                if (!isNaN(id)) {
+                    canvas.setNewLadderID(id)
+                }
             }
         }
     }

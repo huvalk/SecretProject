@@ -162,17 +162,40 @@ std::shared_ptr<GraphicLine> GraphicContainer::findLine(const int floor, const Q
     return nullptr;
 }
 
+std::shared_ptr<GraphicPolygon> GraphicContainer::findPoly(const int floor, const QPointF &pos)
+{
+    //TODO передавать нужный этаж
+    auto currentFloor = _polygons.find(floor);
+    if (currentFloor == _polygons.end())
+    {
+        return nullptr;
+    }
+
+    for (auto item : currentFloor->second)
+    {
+        if (item->wasClicked(pos))
+        {
+            return item;
+        }
+    }
+    return nullptr;
+}
+
 QRectF GraphicContainer::addFrom(const int floor, const QPointF &pos)
 {
     _fromToPoints[0] = std::make_pair(floor, std::make_shared<QPointF>(pos));
+
+    return QRectF();
 }
 
 QRectF GraphicContainer::addTo(const int floor, const QPointF &pos)
 {
     _fromToPoints[1] = std::make_pair(floor, std::make_shared<QPointF>(pos));
+
+    return QRectF();
 }
 
-QRectF GraphicContainer::addPoint(const int floor, const QPointF &pos)
+QRectF GraphicContainer::addPoint(const int floor, const QPointF &pos, const int &id)
 {
     auto tempPoint = findPoint(floor, pos);
     if (tempPoint == nullptr)
@@ -180,6 +203,8 @@ QRectF GraphicContainer::addPoint(const int floor, const QPointF &pos)
         tempPoint = std::make_shared<GraphicPoint>(pos, _pointSize, 2);
         _points[floor].insert(tempPoint);
     }
+
+    tempPoint->setId(static_cast<u_int16_t>(id));
     return tempPoint->boundingRect();
 }
 
@@ -191,9 +216,11 @@ QRectF GraphicContainer::addLine(const int floor, const QLineF &line)
     return newLine->boundingRect();
 }
 
-QRectF GraphicContainer::addPolygon(const int floor, const QPolygonF &poly)
+QRectF GraphicContainer::addPolygon(const int floor, const QPolygonF &poly, const int &id)
 {
-    _polygons[floor].insert(std::make_shared<GraphicPolygon>(poly));
+    auto newPoly = std::make_shared<GraphicPolygon>(poly);
+    newPoly->setId(static_cast<u_int16_t>(id));
+    _polygons[floor].insert(newPoly);
 
     return poly.boundingRect();
 }
@@ -231,6 +258,17 @@ std::pair<bool, QRectF> GraphicContainer::deleteItem(const int floor, const QPoi
         _lines[floor].erase(line);
 
         return std::make_pair(true, line->boundingRect());
+    }
+
+    auto poly = findPoly(floor, pos);
+
+    if (poly != nullptr)
+    {
+//        addPoint(floor, line->getFirstPoint());
+//        addPoint(floor, line->getSecondPoint());
+        _polygons[floor].erase(poly);
+
+        return std::make_pair(true, poly->boundingRect());
     }
 
     return std::make_pair(false, QRectF());
@@ -433,11 +471,13 @@ void GraphicContainer::updateCameras(std::unordered_map<u_int64_t, u_int64_t> &c
         for (auto const &poly: floor.second)
         {
             auto curPeople = cameras[static_cast<u_int64_t>(poly->getId())];
-            if (curPeople > 1)
+            if (curPeople > 2)
             {
                 poly->setColor("orange");
-            } else {
+            } else if (curPeople > 1) {
                 poly->setColor("blue");
+            } else {
+                poly->setColor("green");
             }
         }
     }
