@@ -52,21 +52,26 @@ GraphicTypes::building<GraphicLine> GraphManager::findPath(std::pair<int, QPoint
 
         if (success)
         {
-            _graph.AddEdge(secondId, _pivotToNode[std::make_pair(from.first, *toPivote)], newPath.length());
+            _graph.AddEdge(secondId, _pivotToNode[std::make_pair(to.first, *toPivote)], newPath.length());
         }
     }
     // Между точками напрямую
     auto newPath = QLineF(to.second, from.second);
 
     bool success = true;
-    for (const auto &line: _walls[to.first])
+    if (from.first == to.first)
     {
-        auto intersectes = line->intersect(newPath, nullptr);
-        if (intersectes == QLineF::BoundedIntersection)
+        for (const auto &line: _walls[to.first])
         {
-            success = false;
-            break;
+            auto intersectes = line->intersect(newPath, nullptr);
+            if (intersectes == QLineF::BoundedIntersection)
+            {
+                success = false;
+                break;
+            }
         }
+    } else {
+        success = false;
     }
 
     if (success)
@@ -102,6 +107,8 @@ GraphicTypes::building<GraphicLine> GraphManager::findPath(std::pair<int, QPoint
 
 void GraphManager::repopulateGraph(const GraphicTypes::building<GraphicLine> &walls, const GraphicTypes::building<GraphicPoint> &ladders)
 {
+    findLadderPivotes(ladders);
+
     auto result = std::vector<GraphicLine>{};
     auto floorHeight = 10;
     for (auto floor: walls)
@@ -120,6 +127,7 @@ void GraphManager::repopulateGraph(const GraphicTypes::building<GraphicLine> &wa
 
         repopulateFloor(floor.first);
     }
+
 }
 
 void GraphManager::findLinePivotes(const QLineF &line, const int &floor)
@@ -164,81 +172,6 @@ void GraphManager::findLinePivotes(const QLineF &line, const int &floor)
        _nodeToPivot[newId] = std::make_pair(floor, newPivote);
        _pivotToNode[std::make_pair(floor, newPivote)] = newId;
     }
-//    auto pathCenter = line.center();
-//    auto c = line.length();
-//    auto cos = (p2.x() - p1.x()) / c;
-//    auto sin = (p2.y() - p1.y()) / c;
-
-//    auto centerPivot1 = QPointF(
-//                (pathCenter.x() - sin * 35), (pathCenter.y() - cos * padding)
-//                );
-//    auto centerPivot2 = QPointF(
-//                (pathCenter.x() + sin * 35), (pathCenter.y() + cos * padding)
-//                );
-//    newFloorPivots.insert(std::make_shared<QPointF>(centerPivot1));
-//    newFloorPivots.insert(std::make_shared<QPointF>(centerPivot2));
-
-//    auto c1 = std::hypot(centerPivot1.x() - p1.x(), centerPivot1.y() - p1.y());
-//    auto c2 = std::hypot(centerPivot2.x() - p1.x(), centerPivot2.y() - p1.y());
-//    auto cos1 = (centerPivot1.x() - p1.x()) / c1;
-//    auto sin1 = (centerPivot1.y() - p1.y()) / c1;
-//    auto cos2 = (centerPivot2.x() - p1.x()) / c2;
-//    auto sin2 = (centerPivot2.y() - p1.y()) / c2;
-
-//    auto dx1 = cos1 * padding;
-//    auto dy1 = sin1 * padding;
-//    auto dx2 = cos2 * padding;
-//    auto dy2 = sin2 * padding;
-
-//    // Внутри
-//    auto newPivote = QPointF(p1.x() + dx1, p1.y() + dy1);
-//    newFloorPivots->second.insert(std::make_shared<QPointF>(newPivote));
-//    auto newId = static_cast<GraphTypes::Node>(_nodeToPivot.size());
-//    _nodeToPivot[newId] = std::make_pair(floor, newPivote);
-//    _pivotToNode[std::make_pair(floor, newPivote)] = newId;
-
-//    newPivote = QPointF(p1.x() + dx2, p1.y() + dy2);
-//    newFloorPivots->second.insert(std::make_shared<QPointF>(newPivote));
-//    newId = static_cast<GraphTypes::Node>(_nodeToPivot.size());
-//    _nodeToPivot[newId] = std::make_pair(floor, newPivote);
-//    _pivotToNode[std::make_pair(floor, newPivote)] = newId;
-
-//    newPivote = QPointF(p2.x() - dx1, p2.y() - dy1);
-//    newFloorPivots->second.insert(std::make_shared<QPointF>(newPivote));
-//    newId = static_cast<GraphTypes::Node>(_nodeToPivot.size());
-//    _nodeToPivot[newId] = std::make_pair(floor, newPivote);
-//    _pivotToNode[std::make_pair(floor, newPivote)] = newId;
-
-//    newPivote = QPointF(p2.x() - dx2, p2.y() - dy2);
-//    newFloorPivots->second.insert(std::make_shared<QPointF>(newPivote));
-//    newId = static_cast<GraphTypes::Node>(_nodeToPivot.size());
-//    _nodeToPivot[newId] = std::make_pair(floor, newPivote);
-//    _pivotToNode[std::make_pair(floor, newPivote)] = newId;
-
-//    // Снаружи
-//    newPivote = QPointF(p2.x() + dx1, p2.y() + dy1);
-//    newFloorPivots->second.insert(std::make_shared<QPointF>(newPivote));
-//    newId = static_cast<GraphTypes::Node>(_nodeToPivot.size());
-//    _nodeToPivot[newId] = std::make_pair(floor, newPivote);
-//    _pivotToNode[std::make_pair(floor, newPivote)] = newId;
-
-//    newPivote = QPointF(p2.x() + dx2, p2.y() + dy2);
-//    newFloorPivots->second.insert(std::make_shared<QPointF>(newPivote));
-//    newId = static_cast<GraphTypes::Node>(_nodeToPivot.size());
-//    _nodeToPivot[newId] = std::make_pair(floor, newPivote);
-//    _pivotToNode[std::make_pair(floor, newPivote)] = newId;
-
-//    newPivote = QPointF(p1.x() - dx1, p1.y() - dy1);
-//    newFloorPivots->second.insert(std::make_shared<QPointF>(newPivote));
-//    newId = static_cast<GraphTypes::Node>(_nodeToPivot.size());
-//    _nodeToPivot[newId] = std::make_pair(floor, newPivote);
-//    _pivotToNode[std::make_pair(floor, newPivote)] = newId;
-
-//    newPivote = QPointF(p1.x() - dx2, p1.y() - dy2);
-//    newFloorPivots->second.insert(std::make_shared<QPointF>(newPivote));
-//    newId = static_cast<GraphTypes::Node>(_nodeToPivot.size());
-//    _nodeToPivot[newId] = std::make_pair(floor, newPivote);
-//    _pivotToNode[std::make_pair(floor, newPivote)] = newId;
 }
 
 void GraphManager::findLadderPivotes(const GraphicTypes::building<GraphicPoint> &ladders)
